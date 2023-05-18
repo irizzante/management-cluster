@@ -1,0 +1,193 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xmanagementclusterapps.irizzant.it
+spec:
+  writeConnectionSecretsToNamespace: crossplane-system
+  compositeTypeRef:
+    apiVersion: irizzant.it/v1alpha1
+    kind: XManagementClusterApps
+  resources:
+    - name: helm-provider-config
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: ProviderConfig
+        metadata:
+          name: helm-provider
+        spec:
+          credentials:
+            source: InjectedIdentity
+    - name: k8s-provider-config
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: ProviderConfig
+        metadata:
+          name: kubernetes-provider
+        spec:
+          credentials:
+            source: InjectedIdentity
+    - name: argocd-chart
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: Release
+        metadata:
+          name: argocd
+        spec:
+        # rollbackLimit: 3
+          forProvider:
+            chart:
+              name: wordpress
+              repository: https://charts.bitnami.com/bitnami
+              version: 15.2.5 ## To use devlopment versions, set ">0.0.0-0"
+            namespace: argocd
+            values:
+              redis-ha:
+                enabled: true
+
+              controller:
+                replicas: 1
+
+              server:
+                autoscaling:
+                  enabled: true
+                  minReplicas: 2
+
+              repoServer:
+                autoscaling:
+                  enabled: true
+                  minReplicas: 2
+
+              applicationSet:
+                replicaCount: 2
+          connectionDetails:
+          - apiVersion: v1
+            kind: Service
+            name: argocd-server
+            namespace: argocd
+            fieldPath: status.loadBalancer.ingress[0].ip
+            toConnectionSecretKey: argocd-ip
+          - apiVersion: v1
+            kind: Secret
+            name: argocd-initial-admin-secret
+            namespace: argocd
+            fieldPath: data.password
+            toConnectionSecretKey: argocd-password
+            skipPartOfReleaseCheck: true
+        writeConnectionSecretToRef:
+          namespace: crossplane-system
+          providerConfigRef:
+            name: helm-provider
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.providerConfigRef.name
+      connectionDetails:
+        - fromConnectionSecretKey: argocd-ip
+        - fromConnectionSecretKey: argocd-password
+      patches:
+        - fromFieldPath: "metadata.uid"
+          toFieldPath: "spec.writeConnectionSecretToRef.name"
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-argocd"
+
+    - name: vcluster-helm-release
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: Release
+        metadata:
+          annotations:
+            crossplane.io/external-name: # patched
+        spec:
+          rollbackLimit: 3
+          forProvider:
+            namespace: dev-environments
+            chart:
+              name: vcluster
+              repository: https://charts.loft.sh
+              version: "0.15.0"
+            values:
+              isolation:
+                enabled: true
+              sync:
+                nodes:
+                  enabled: true
+                  syncAllNodes: true
+                persistentvolumes:
+                  enabled: true
+                ingresses:
+                  enabled: true
+                networkpolicies:
+                  enabled: true
+              syncer:
+                extraArgs: [] # patched
+          providerConfigRef:
+            name: helm-provider
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.values.syncer.extraArgs[0]
+          transforms:
+            - type: string
+              string:
+                fmt: "--out-kube-config-server=https://%s.dev-environments.svc.cluster.local"
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.values.syncer.extraArgs[1]
+          transforms:
+            - type: string
+              string:
+                fmt: "--tls-san=%s.dev-environments.svc.cluster.local"
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.annotations[crossplane.io/external-name]
+          policy:
+            fromFieldPath: Required
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-vcluster"
+    - name: helm-provider-vcluster
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: ProviderConfig
+        spec:
+          credentials:
+            source: Secret
+            secretRef:
+              namespace: dev-environments
+              key: config
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+        # This ProviderConfig uses the above VCluster's connection secret as
+        # its credentials secret.
+        - fromFieldPath: "metadata.name"
+          toFieldPath: spec.credentials.secretRef.name
+          transforms:
+            - type: string
+              string:
+                fmt: "vc-%s"
+      readinessChecks:
+        - type: None      
+    - name: wordpress-chart
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: Release
+        metadata:
+          name: wordpress-example
+        spec:
+        # rollbackLimit: 3
+          forProvider:
+            chart:
+              name: wordpress
+              repository: https://charts.bitnami.com/bitnami
+              version: 15.2.5 ## To use devlopment versions, set ">0.0.0-0"
+            namespace: wordpress
+            values:
+              service:
+                type: ClusterIP
+          providerConfigRef:
+            name: # patched
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.providerConfigRef.name
