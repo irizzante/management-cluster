@@ -8,36 +8,38 @@ spec:
     apiVersion: irizzant.it/v1alpha1
     kind: XManagementClusterApps
   resources:
-    - name: helm-provider-config
-      base:
-        apiVersion: helm.crossplane.io/v1beta1
-        kind: ProviderConfig
-        metadata:
-          name: helm-provider
-        spec:
-          credentials:
-            source: InjectedIdentity
-    - name: k8s-provider-config
-      base:
-        apiVersion: kubernetes.crossplane.io/v1alpha1
-        kind: ProviderConfig
-        metadata:
-          name: kubernetes-provider
-        spec:
-          credentials:
-            source: InjectedIdentity
-    - name: argocd-chart
+    - name: sealed-secret
       base:
         apiVersion: helm.crossplane.io/v1beta1
         kind: Release
         metadata:
-          name: argocd
+          name: #patched
         spec:
           providerConfigRef:
             name: helm-provider
           forProvider:
             chart:
-              name: wordpress
+              name: sealed-secrets
+              repository: https://bitnami-labs.github.io/sealed-secrets/
+              version: 2.9.0
+            namespace: kube-system
+      patches:
+        - fromFieldPath: spec.id
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-sealed-secrets"
+    - name: argocd-chart
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: Release
+        spec:
+          providerConfigRef:
+            name: helm-provider
+          forProvider:
+            chart:
+              name: argo-cd
               repository: https://argoproj.github.io/argo-helm
               version: 5.34.1
             namespace: argocd
@@ -59,24 +61,120 @@ spec:
               configs:
                 cm:
                   application.resourceTrackingMethod: annotation
-          connectionDetails:
-          - apiVersion: v1
-            kind: Secret
-            name: argocd-initial-admin-secret
-            namespace: argocd
-            fieldPath: data.password
-            toConnectionSecretKey: argocd-password
-            skipPartOfReleaseCheck: true
-          writeConnectionSecretToRef:
-            namespace: crossplane-system
       patches:
-        - fromFieldPath: metadata.name
-          toFieldPath: spec.providerConfigRef.name
-        - fromFieldPath: "metadata.uid"
-          toFieldPath: "spec.writeConnectionSecretToRef.name"
+        - fromFieldPath: spec.id
+          toFieldPath: metadata.name
           transforms:
             - type: string
               string:
                 fmt: "%s-argocd"
-      connectionDetails:
-        - fromConnectionSecretKey: argocd-password        
+    - name: argocd-repository-credentials
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        metadata:
+          name: #patched
+        spec:
+          forProvider:
+            manifest:
+              apiVersion: bitnami.com/v1alpha1
+              kind: SealedSecret
+              metadata:
+                creationTimestamp: null
+                name: argocd-repository-credentials
+                namespace: argocd
+              spec:
+                encryptedData:
+                  githubAppID: AgCeKzyYgt2BUxf5yeebeL5o9CH7iXQli84Y18ZgXkXe1dLNHQ8Y3kJ6G1iTOQjHEMdhOX69eYHpkaZeRczA7CK77lmFUswpXdBxh91EJOS7/GSLnvHQ0yyUYd49Xe8PRz1JcSd2trtf1Oj8b/IVcIBYPtfOS7h4k8AJpOOkaIMXyYvN9vD+G4aSmXpWrsTFHBYKRqbeBRb+v00mYqaNSM7F/OyAgUgLqiRadmsn5KQQNrjj/E6ResqGP101tcFan5fSrhsqabYrAId66q9Vv7kN/WrD19Q7HkKdlJb7G/xVk4TFkXuJn4qiZ5vzwra/Nt0KNTJAwUlfL/5e0aWduXhW2cNEIH4m0r+60T7et/UmN+a2K8eZR8ORAs118G2xT6a+x1rlzfKCfxeTe5wdifqI4OMASdnFLWNxK/AyFLpNfSJ2SR35C/MAER5hf/eZTH8zf5diuuLbHwUnef+wdfUaGFItZw7h8FiSZx8z/xE8bdl+0HTHXGejHiCnndoJA+CQJEoBn0EJoYA5PtFQXT/LQJ9iwiJCNtwVWWRUkxVRCDc8hgMgn+EzV4Nl6qlvghmm3eBFR58ipBs1EmC3izH0+4c3nfkDAgkchDAx/DPl1s4QqdOeU9otOwCuE/hLCe8rxHLxNM2rGQN2Fc/ovukPMwILSH/3rwLLrJSUPrjIPjXSP5prOT/JzMUhjInZ2TNLzRPtdy4=
+                  githubAppInstallationID: AgBhieg795HCBtr2yfQbQj9QjtaSP5spILxF3hDb4MiaXTG8ATAoF3y6zFoeeI7Y6glz0J/o44/7OeeodKlHlry4H4ssWWNjwYtV48Sc7vRxP7r6Ov3ociHaWhjk7/t7Uc+D3n77HW+eKd6iCbjxoOHT9YUujsnnBIJcs4Buzdm0D1AqolOqOq2SdUB9hmZVI333LUKLJuf0I8C2EJ4/S2ybFsSE6UlmHM8KkyVlkXLbQd6MDUUwnJveOLDdphSqOw6/MNo3cG/rHnivW/HPpeX4aFK+GrnLStRTvcJlg7SLKLBNK9xlPDehDGnXCMjIvUME8hu0oDwBn0q4VFTQCgYe0sMgg7+83HnfFza96+WBu8we+OSPStl0zV8yPWjuGsw11Dk9KL7WrE/nMJGtkpHJXm11/ghAI2Ejxa3kvHUuDtAr6hrk9T0slL+NWgIlrA7/a5p1lHrSdw6r+nFgzuevr5LN9URx2SyVnEWgHViTXTnSIUg7aw4WPrICYsO6KdO3GiGWnl1/FR4hSfNHaNTm+YpFbGRQn6N/cbe6bAnpf9lDWXPtGV5Vk1qV2VaA9qGkgCJ4wzr24Td9PlmE3vV4PAQFdeArLYbBf0YF6BFEY7wc85G0tkFZ7/sBHg8kx/BcDuVidQNcDFZh9rCedMZfECpR4aAnr9xG1KQHpRGOgL3cr4/eeKn4hzH0D9l3oE1xWm27KAxkLA==
+                  githubAppPrivateKey: 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
+                  url: AgBA97018pV9MGWdYAbeLRPJsWR2Dm4BIx/jm0bYNCnK7ESz9vGfQvcexPE4hRZTF4VmQxhjBcqfBVxbp/zu1/1iyk6dPcsFD3d5oYPaYdlMM8nVK3nvTaFvs//U/WZcACQV9xbQC02c5uRPEwyT+Avpja48ooP4djqKPdfBYcdYJIH+nnAzJNXLY7YKED0HPZsBmpTH9Fy/aFmYMz/QOOdQQJLXbO8cF1Mncf0WhYHF8UlpoqkeVURHQBunXFtQH/g3A793ceW5VSEyE1/0tbD2WcyvZk180MKWpPoN4Bn3PzpqbhE6h2bEXVsJwM8dUWb99GxUwWIv6sNV+A7frmXTGbaxQCiKHBCobKk4uk8sM9S2W43BUE2iRzTCwG+t5QaJsq48uSbO0ZQ4RXxGcrBLdmpZvCgzdr4PgbYh4kipI62R8mXYM6+tgQUDVpTny3X8aQvwqBtQ+NGo9a0LyIbb9BwwLZpti5WvyPEp5NBGIYPIKFoga/YJq66+wOrIGsY7r3MalMc9kblmonbZtGhTIsykpbHi1ZFp/t61fessmNq1xklbX9Zy6aJlMtL/3Ak2bwrtxUhRE10EdlMnvIyIkkp5WfUWAzOcnde0gzT7OF9pRXZYAAo2obIqUqFgzwxnq/Bh2CLY8xg6sMLPaY3ZGLIB+752ESJxv+AP1fDS58JcXIMx1yCDxFbGP4E1up9FKbl2jX4ZuO7l5gWLfg7VNQxWlIBhDxpoyCRj
+                template:
+                  metadata:
+                    creationTimestamp: null
+                    labels:
+                      argocd.argoproj.io/secret-type: repo-creds
+                    name: argocd-repository-credentials
+                    namespace: argocd
+          managementPolicy: ObserveDelete
+          providerConfigRef:
+            name: kubernetes-provider
+      patches:
+      - fromFieldPath: spec.id
+        toFieldPath: metadata.name
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-argocd-repository-credentials"
+    - name: argocd-repository
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        metadata:
+          name: #patched
+        spec:
+          forProvider:
+            manifest:
+              apiVersion: bitnami.com/v1alpha1
+              kind: SealedSecret
+              metadata:
+                creationTimestamp: null
+                name: irizzante-repo
+                namespace: argocd
+              spec:
+                encryptedData:
+                  type: AgAsjGsapItETu9/xFrkiwUXCgGptS/lhGI/KhxyRKOEZO+vRPPalLn72VnvbuuMzoJl34Tg3L0ws4k+kEALpJaf/vq8awFZW1Mq9xIGgDtzYJicJF7cQ+3mdMM+roqbFWpg91lVcC7AwDK6ZZ8FbrGSigmennoqcClJzejc4KRh1XgB9Z+DCwucO39+Ja7dAYOQdArQ0odpUTFdUdxJXa/ChWmIC+cNloPgo2WxvL1k4uGbRVk5xazCMnCN8o9ucpsQ7evfOlVEpGoC+NPsEtmDE/UauvYfP/jDM24zqFvBY1hvbOlsA0Yw8e3Rssv1To0NUdt7FwFzltqyR9O7iHp0PjIAmRjsInexmxgQqmnL8K77Zk0JaayB47Qfv7D9G5fKy7jwWZKfrHUCZ9V0WAh034zCFZPG1btJeIMdOVoOICs1Xfwu8QTwEHs3OLIGPJXpSNg6vMzn0IbnMe0o1/UrlBHvffhH/S5EGkyneuEL3RheFkKWCR/g+6iMRAlmzkWjkwo99UdCHasDkugTwgHmU7Ph/P1WyzuIlfGyZV60YFax8wJJABQlm46lR11am858jp+Aa1gJdU3r3YlIpz5p0Lyut4Lr3zzlkFD6zs1hE1HUm0/KZDCAwhb4ZM/1v1FsPBKCBWbSHZMi/5XE2J+du/eDMl3YOEXudC0QMFZfciwbdpqwF8OWq/VYw/ycRwyrsDc=
+                  url: AgBbhLcyfPyVljF9S1qZlMY+wi+nuM/GYg6GixfMvqVAf5ED1OqjkS/xHBo1cAUm3MV88Mm8D2eLnkisa0Sur70lG29ioo6xCXAZvIhj+j3p30ECrP8wgFT4OSRNlXue3GgAWOf62GR9npcY/WyyV7nU9iaSselGV9ORWqTYxtFtWk0Do4dzgpNFjar9wg296R6Vtr7WPGGxwwuey3vZ9jRNCMQNZb0eP3V4OO1ac/LrQ062Mm/CXQj6aMgw1vwQYf8SPJCawfjd9+2D7EEeTaH0Hbd+ZFQiowTPPADv+UZul7aEF1kBG44eHAuJ7Th694D3yDZ4PVzigRSrJ4chii0vjvZVRIHlG9UzC7IkIwbiRdGr67TEKc/n0YUv60UpF6DH3ApVeYAzuH3difEnws152Qo1wSsJvukitL/Vj0ELDp37e4m95vpka1jA8cNynQCfZM6onmgykFmD2uGlsbIuedXH0xGvJWNNKHcBcHNG1jzo/WuLlqB9xOFDNUPAtffRXTHeqZ1Xn+HJ6lp8iCDgt/DClsuSaGZq6WsHvv1oe+GeLiidOUii0PCkw+/efERBtAsrLqMIN/bPGKENNhwofgqxCion50SOYxArQmVWmgDqnEQ7BV7PId/H8kkLZ0f0ZGN7anbVbzEqhOc5u6vPIor+qrBYoJG8uEXtp6oKI4orpHg1LYywhz11pLNuGEiLgLWy+B4t/HPgXKSnkUWanhTyQ1Wosd99inx7CXgyHockogt+A+jYHgLEHV8FXXnEF3U=
+                template:
+                  metadata:
+                    creationTimestamp: null
+                    labels:
+                      argocd.argoproj.io/secret-type: repository
+                    name: irizzante-repo
+                    namespace: argocd
+          managementPolicy: ObserveDelete
+          providerConfigRef:
+            name: kubernetes-provider
+      patches:
+      - fromFieldPath: spec.id
+        toFieldPath: metadata.name
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-argocd-repository"
+    - name: argocd-project
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        spec:
+          providerConfigRef:
+            name: kubernetes-provider
+          forProvider:
+            manifest:
+              apiVersion: argoproj.io/v1alpha1
+              kind: AppProject
+              metadata:
+                name: platform
+                namespace: argocd
+                finalizers:
+                  - resources-finalizer.argocd.argoproj.io
+              spec:
+                description: Platform team project
+                sourceRepos:
+                - 'https://github.com/irizzante/management-cluster.git'
+                destinations:
+                - namespace: '*'
+                  server: 'https://kubernetes.default.svc'
+                clusterResourceWhitelist:
+                - group: '*'
+                  kind: '*'
+                namespaceResourceWhitelist:
+                - group: '*'
+                  kind: '*'
+      patches:
+      - fromFieldPath: spec.id
+        toFieldPath: metadata.name
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-argocd-project"
