@@ -21,7 +21,7 @@
 	// "postCreateCommand": "kubectl version",
 
 	// Use 'postStartCommand' to run commands after the container is created like starting minikube.
-	"postStartCommand": "echo 'alias k=kubectl' | tee --append ~/.bashrc ; echo 'complete -F __start_kubectl k' | tee --append ~/.bashrc"
+	"postStartCommand": "echo 'alias k=kubectl' | tee --append ~/.bashrc ; echo 'complete -F __start_kubectl k' | tee --append ~/.bashrc ; export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
