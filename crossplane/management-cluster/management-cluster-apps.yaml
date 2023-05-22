@@ -44,20 +44,6 @@ spec:
               version: 5.34.1
             namespace: argocd
             values:
-              redis-ha:
-                enabled: true
-              controller:
-                replicas: 1
-              server:
-                autoscaling:
-                  enabled: true
-                  minReplicas: 2
-              repoServer:
-                autoscaling:
-                  enabled: true
-                  minReplicas: 2
-              applicationSet:
-                replicaCount: 2
               configs:
                 cm:
                   application.resourceTrackingMethod: annotation
@@ -133,6 +119,7 @@ spec:
                       argocd.argoproj.io/secret-type: repository
                     name: irizzante-repo
                     namespace: argocd
+                  type: Opaque
           managementPolicy: ObserveDelete
           providerConfigRef:
             name: kubernetes-provider
