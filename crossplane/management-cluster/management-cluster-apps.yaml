@@ -1,0 +1,241 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xmanagementclusterapps.irizzant.it
+spec:
+  writeConnectionSecretsToNamespace: crossplane-system
+  compositeTypeRef:
+    apiVersion: irizzant.it/v1alpha1
+    kind: XManagementClusterApps
+  resources:
+    - name: sealed-secrets
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: Release
+        metadata:
+          annotations:
+            crossplane.io/external-name: sealed-secrets
+        spec:
+          providerConfigRef:
+            name: helm-provider
+          forProvider:
+            chart:
+              name: sealed-secrets
+              repository: https://bitnami-labs.github.io/sealed-secrets/
+              version: 2.9.0
+            namespace: kube-system
+      patches:
+      - type: CombineFromComposite
+        policy:
+          fromFieldPath: Required
+        toFieldPath: metadata.name
+        combine:
+          variables:
+            - fromFieldPath: metadata.name
+          strategy: string
+          string:
+            fmt: "%s-sealed-secrets"
+    - name: argocd-chart
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: Release
+        metadata:
+          annotations:
+            crossplane.io/external-name: argocd
+        spec:
+          providerConfigRef:
+            name: helm-provider
+          forProvider:
+            chart:
+              name: argo-cd
+              repository: https://argoproj.github.io/argo-helm
+              version: 5.34.1
+            namespace: argocd
+            values:
+              configs:
+                cm:
+                  application.resourceTrackingMethod: annotation
+      patches:
+      - type: CombineFromComposite
+        policy:
+          fromFieldPath: Required
+        toFieldPath: metadata.name
+        combine:
+          variables:
+            - fromFieldPath: metadata.name
+          strategy: string
+          string:
+            fmt: "%s-argocd"
+    - name: argocd-repository-credentials
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        metadata:
+          name: #patched
+        spec:
+          forProvider:
+            manifest:
+              apiVersion: bitnami.com/v1alpha1
+              kind: SealedSecret
+              metadata:
+                creationTimestamp: null
+                name: argocd-repository-credentials
+                namespace: argocd
+              spec:
+                encryptedData:
+                  githubAppID: AgCeHWqDRZqJHX6YunfWrbgedNZ56+SXatJ5C2D2DcegNgBBUvUm1j1Rv0HdUTf8WmKgMXiJW+768bHU4+Zogz9srPGd0NTeWZ5JHI4PejbB7EMY3BZgckncybrdWLSwRiKCOY7vGhRfsrD35o5youHdHD6FYtq2DuR+bLj6MvnwlI5oRE2kcB2adAEmweXcqIACInQM3wCVKqkAv9vP29KXamXYiio9cunJ6wQH0vJy/PUMA8SpoXGiQmfynjRHxhBtrmkyRG8bW+eOs07DCk0mkULbmaeZgklhefy+8PwgExN9BPyDPpjLebLL5P8PQELyl1XTstgvuJgYH3oEiqH1T1NgKl7JoYi0ruR/jHMdTpgNqMLQYUpN7wrTa6jr5LNj6X3vjVVHICxEaxMSz5n5+e3YD5vs6+ALR2QE6wrZRN4gAlGQmbMFHQQKiO7wBcCwo07MRlJwrLsPeF3CbE2CKQVZcUOj5TpBerfvflpYmnftBu7AylyO0AhtzFLSg0MoqM8oSjdQ3n53XvtumcyXjeC4gzlPLaOR3GypMVCSyLdp308lBv/98MbdpyQ4tYK9aRdOq0KZY02weUFlR4R2y0krroQepupcgaA8aJw3WsutHDgTGCgMXS+9UiRhJzwD/W/n0N4+Z6n9UyXk93srrUFx4j5gLmCSosIfloeAvx15THpWFd+g7Cpn29nS4XKhV7bfbII=
+                  githubAppInstallationID: AgBCWO9cXvzFVVzE5gg8gTYYAFdej2Y+y2gc1bm1RfQograGyUgAtDj2tp91vyWn6H0tVevkXrbPRFD6gskl8x/PYpgGgba+y3898JZLp5CT1SoW4wJdLbNNfHeTpFCA0fGv2/HPjaJfAIaLky4vD78aiiF+egk76bueL2dz10tyz6KaDI4Pvw6TgyU0CSVAXyvP5Auc/XK1LSCXXBtTiRVNIZDnnFUmDTKgGPcDm3JupUaQuZZ5l6eqTO99FlgeWZX1cUr3Bx33T2HLc5qfkEuxUMSmkZt6Ly5UutV4tB42N/DuLrNi2dAgUk80FkmZprsLzGC5L3LO2SkoOLBYM+SOXoZOvTOHmvdT4nEKVO+0uYhuYVaNs3lCmwQlx3pwOpQK9VoemnXHPFpmbD0FIeOMn4O4T8PfdGWdtRCHKKqkKJMLX6yKvtCFwRIRUtbTYKMruYjr2g9dR2CBin7nS9r+rxb9gubZWUqbZpv8vMmHe7iQkQQzy0DJYp210i43fuc8L4HdI9lExi7uCSp/bnFbi2YcAFDJu5am/Ewv4PmDJwDZOriDAXL4D9TFhmI8qNj496lJo4dleWYKl24B4Pp+QVhdHPWQxn/n75yIEXT67puNlFBrs42FX/hO/ehNHNm77cpFdaUEP0mCT2Fn3dkTd8a2MS3YLbeyHPuwJZIVzYCpYoPUy7cSacQnAjuZPBEMNneEg5ATGQ==
+                  githubAppPrivateKey: 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
+                  url: AgBsZ9R5RJ5IJTahDYTuhUdpFBTlruscQ1KpcbUEv7Xy5qIjmvhgSb5+5r3YVlN6FqaPEvOcelWE/rVV3bZJOxdMRbj7QtELGKpqeNvx+KZiuGHRZcGapyoOz8aPyJ0YbzdWbcHgb3OpFswRF0N3t+6iXhifh82ULEmDbCuEHXKmMhe84PAJnYvtPjSYF4mO6HIYC3lq0YVUsQTkOsMhrBkst9NiZGfPu+/mp77D3m/ou00TciA8DGXD67IAMy3prNHzY2wESP9Pv2REka/+EUKmSJbbkQtTpWNW5Pcbab9auW6uFR7jnCtRMlRzCqNP+oQTz3PZ8MHebKToIzQT/7lJbIm0CeD4ZyGnLytfAxIKV+ZPbKqdVztanpBOej6wdf+P2bkfw01NI9aSzuy7tv834sbJvPUT6a+kT7WhntEa2/oBMexkruWPlcnAa5Rsyg71dbZg7imeEvnAZACSsHsNfTT2IHZv/93dH8C3/wjqyoiayGKEr2kYQuJrPy4tUSVL6QEhTR/7dBjEk3BHGvfAgEKhwiWWAdKI55EdHnx5zPETVWpBNUphP96D4f+9PZBOukP4LmBy61EulY7CNwKKnJ2/ujoEnCmFuKmfnnw/Xv0psFJE3bzpyut6UKV0unN+FOIiJRl/WgYTrE3W1K1wolCX5thn732nlWlOEXWM4izEhA2V5KNP37slathoLsncX1osQyTeg2PUWaMq7/QX4OJlzYoduKq+hURo
+                template:
+                  metadata:
+                    creationTimestamp: null
+                    labels:
+                      argocd.argoproj.io/secret-type: repo-creds
+                    name: argocd-repository-credentials
+                    namespace: argocd
+                  type: Opaque
+          providerConfigRef:
+            name: kubernetes-provider
+      patches:
+      - type: CombineFromComposite
+        policy:
+          fromFieldPath: Required
+        toFieldPath: metadata.name
+        combine:
+          variables:
+            - fromFieldPath: metadata.name
+          strategy: string
+          string:
+            fmt: "%s-argocd-repository-credentials"
+    - name: argocd-repository
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        metadata:
+          name: #patched
+        spec:
+          forProvider:
+            manifest:
+              apiVersion: bitnami.com/v1alpha1
+              kind: SealedSecret
+              metadata:
+                creationTimestamp: null
+                name: irizzante-repo
+                namespace: argocd
+              spec:
+                encryptedData:
+                  type: AgAsjGsapItETu9/xFrkiwUXCgGptS/lhGI/KhxyRKOEZO+vRPPalLn72VnvbuuMzoJl34Tg3L0ws4k+kEALpJaf/vq8awFZW1Mq9xIGgDtzYJicJF7cQ+3mdMM+roqbFWpg91lVcC7AwDK6ZZ8FbrGSigmennoqcClJzejc4KRh1XgB9Z+DCwucO39+Ja7dAYOQdArQ0odpUTFdUdxJXa/ChWmIC+cNloPgo2WxvL1k4uGbRVk5xazCMnCN8o9ucpsQ7evfOlVEpGoC+NPsEtmDE/UauvYfP/jDM24zqFvBY1hvbOlsA0Yw8e3Rssv1To0NUdt7FwFzltqyR9O7iHp0PjIAmRjsInexmxgQqmnL8K77Zk0JaayB47Qfv7D9G5fKy7jwWZKfrHUCZ9V0WAh034zCFZPG1btJeIMdOVoOICs1Xfwu8QTwEHs3OLIGPJXpSNg6vMzn0IbnMe0o1/UrlBHvffhH/S5EGkyneuEL3RheFkKWCR/g+6iMRAlmzkWjkwo99UdCHasDkugTwgHmU7Ph/P1WyzuIlfGyZV60YFax8wJJABQlm46lR11am858jp+Aa1gJdU3r3YlIpz5p0Lyut4Lr3zzlkFD6zs1hE1HUm0/KZDCAwhb4ZM/1v1FsPBKCBWbSHZMi/5XE2J+du/eDMl3YOEXudC0QMFZfciwbdpqwF8OWq/VYw/ycRwyrsDc=
+                  url: AgBbhLcyfPyVljF9S1qZlMY+wi+nuM/GYg6GixfMvqVAf5ED1OqjkS/xHBo1cAUm3MV88Mm8D2eLnkisa0Sur70lG29ioo6xCXAZvIhj+j3p30ECrP8wgFT4OSRNlXue3GgAWOf62GR9npcY/WyyV7nU9iaSselGV9ORWqTYxtFtWk0Do4dzgpNFjar9wg296R6Vtr7WPGGxwwuey3vZ9jRNCMQNZb0eP3V4OO1ac/LrQ062Mm/CXQj6aMgw1vwQYf8SPJCawfjd9+2D7EEeTaH0Hbd+ZFQiowTPPADv+UZul7aEF1kBG44eHAuJ7Th694D3yDZ4PVzigRSrJ4chii0vjvZVRIHlG9UzC7IkIwbiRdGr67TEKc/n0YUv60UpF6DH3ApVeYAzuH3difEnws152Qo1wSsJvukitL/Vj0ELDp37e4m95vpka1jA8cNynQCfZM6onmgykFmD2uGlsbIuedXH0xGvJWNNKHcBcHNG1jzo/WuLlqB9xOFDNUPAtffRXTHeqZ1Xn+HJ6lp8iCDgt/DClsuSaGZq6WsHvv1oe+GeLiidOUii0PCkw+/efERBtAsrLqMIN/bPGKENNhwofgqxCion50SOYxArQmVWmgDqnEQ7BV7PId/H8kkLZ0f0ZGN7anbVbzEqhOc5u6vPIor+qrBYoJG8uEXtp6oKI4orpHg1LYywhz11pLNuGEiLgLWy+B4t/HPgXKSnkUWanhTyQ1Wosd99inx7CXgyHockogt+A+jYHgLEHV8FXXnEF3U=
+                template:
+                  metadata:
+                    creationTimestamp: null
+                    labels:
+                      argocd.argoproj.io/secret-type: repository
+                    name: irizzante-repo
+                    namespace: argocd
+                  type: Opaque
+          providerConfigRef:
+            name: kubernetes-provider
+      patches:
+      - type: CombineFromComposite
+        policy:
+          fromFieldPath: Required
+        toFieldPath: metadata.name
+        combine:
+          variables:
+            - fromFieldPath: metadata.name
+          strategy: string
+          string:
+            fmt: "%s-argocd-repository"
+    - name: argocd-project
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        spec:
+          providerConfigRef:
+            name: kubernetes-provider
+          forProvider:
+            manifest:
+              apiVersion: argoproj.io/v1alpha1
+              kind: AppProject
+              metadata:
+                name: platform
+                namespace: argocd
+                finalizers:
+                  - resources-finalizer.argocd.argoproj.io
+              spec:
+                description: Platform team project
+                sourceRepos:
+                - 'https://github.com/irizzante/management-cluster.git'
+                destinations:
+                - namespace: '*'
+                  server: 'https://kubernetes.default.svc'
+                clusterResourceWhitelist:
+                - group: '*'
+                  kind: '*'
+                namespaceResourceWhitelist:
+                - group: '*'
+                  kind: '*'
+      patches:
+      - type: CombineFromComposite
+        policy:
+          fromFieldPath: Required
+        toFieldPath: metadata.name
+        combine:
+          variables:
+            - fromFieldPath: metadata.name
+          strategy: string
+          string:
+            fmt: "%s-argocd-platform-project"
+    - name: argocd-application-set
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        spec:
+          providerConfigRef:
+            name: kubernetes-provider
+          forProvider:
+            manifest:
+              apiVersion: argoproj.io/v1alpha1
+              kind: ApplicationSet
+              metadata:
+                name: cluster-addons
+                namespace: argocd
+              spec:
+                generators:
+                - git:
+                    repoURL: https://github.com/irizzante/management-cluster.git
+                    revision: HEAD
+                    directories:
+                    - path: cluster-addons/*
+                template:
+                  metadata:
+                    name: '{{path.basename}}'
+                  spec:
+                    project: default
+                    source:
+                      repoURL: https://github.com/irizzante/management-cluster.git
+                      targetRevision: HEAD
+                      path: '{{path}}'
+                    destination:
+                      server: https://kubernetes.default.svc
+                      namespace: '{{path.basename}}'
+                    syncPolicy:
+                      automated:
+                        selfHeal: true
+                        prune: true
+                        allowEmpty: true
+                      syncOptions:
+                      - PruneLast=true
+      patches:
+      - type: CombineFromComposite
+        policy:
+          fromFieldPath: Required
+        toFieldPath: metadata.name
+        combine:
+          variables:
+            - fromFieldPath: metadata.name
+          strategy: string
+          string:
+            fmt: "%s-argocd-platform-applicationset"
