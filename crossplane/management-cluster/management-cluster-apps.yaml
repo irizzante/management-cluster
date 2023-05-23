@@ -8,12 +8,13 @@ spec:
     apiVersion: irizzant.it/v1alpha1
     kind: XManagementClusterApps
   resources:
-    - name: sealed-secret
+    - name: sealed-secrets
       base:
         apiVersion: helm.crossplane.io/v1beta1
         kind: Release
         metadata:
-          name: #patched
+          annotations:
+            crossplane.io/external-name: sealed-secrets
         spec:
           providerConfigRef:
             name: helm-provider
@@ -24,16 +25,23 @@ spec:
               version: 2.9.0
             namespace: kube-system
       patches:
-        - fromFieldPath: spec.id
-          toFieldPath: metadata.name
-          transforms:
-            - type: string
-              string:
-                fmt: "%s-sealed-secrets"
+      - type: CombineFromComposite
+        policy:
+          fromFieldPath: Required
+        toFieldPath: metadata.name
+        combine:
+          variables:
+            - fromFieldPath: metadata.name
+          strategy: string
+          string:
+            fmt: "%s-sealed-secrets"
     - name: argocd-chart
       base:
         apiVersion: helm.crossplane.io/v1beta1
         kind: Release
+        metadata:
+          annotations:
+            crossplane.io/external-name: argocd
         spec:
           providerConfigRef:
             name: helm-provider
@@ -48,12 +56,16 @@ spec:
                 cm:
                   application.resourceTrackingMethod: annotation
       patches:
-        - fromFieldPath: spec.id
-          toFieldPath: metadata.name
-          transforms:
-            - type: string
-              string:
-                fmt: "%s-argocd"
+      - type: CombineFromComposite
+        policy:
+          fromFieldPath: Required
+        toFieldPath: metadata.name
+        combine:
+          variables:
+            - fromFieldPath: metadata.name
+          strategy: string
+          string:
+            fmt: "%s-argocd"
     - name: argocd-repository-credentials
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
@@ -83,16 +95,19 @@ spec:
                     name: argocd-repository-credentials
                     namespace: argocd
                   type: Opaque
-          managementPolicy: ObserveDelete
           providerConfigRef:
             name: kubernetes-provider
       patches:
-      - fromFieldPath: spec.id
+      - type: CombineFromComposite
+        policy:
+          fromFieldPath: Required
         toFieldPath: metadata.name
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-argocd-repository-credentials"
+        combine:
+          variables:
+            - fromFieldPath: metadata.name
+          strategy: string
+          string:
+            fmt: "%s-argocd-repository-credentials"
     - name: argocd-repository
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
@@ -120,16 +135,19 @@ spec:
                     name: irizzante-repo
                     namespace: argocd
                   type: Opaque
-          managementPolicy: ObserveDelete
           providerConfigRef:
             name: kubernetes-provider
       patches:
-      - fromFieldPath: spec.id
+      - type: CombineFromComposite
+        policy:
+          fromFieldPath: Required
         toFieldPath: metadata.name
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-argocd-repository"
+        combine:
+          variables:
+            - fromFieldPath: metadata.name
+          strategy: string
+          string:
+            fmt: "%s-argocd-repository"
     - name: argocd-project
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
@@ -160,9 +178,64 @@ spec:
                 - group: '*'
                   kind: '*'
       patches:
-      - fromFieldPath: spec.id
+      - type: CombineFromComposite
+        policy:
+          fromFieldPath: Required
         toFieldPath: metadata.name
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-argocd-project"
+        combine:
+          variables:
+            - fromFieldPath: metadata.name
+          strategy: string
+          string:
+            fmt: "%s-argocd-platform-project"
+    - name: argocd-application-set
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        spec:
+          providerConfigRef:
+            name: kubernetes-provider
+          forProvider:
+            manifest:
+              apiVersion: argoproj.io/v1alpha1
+              kind: ApplicationSet
+              metadata:
+                name: cluster-addons
+                namespace: argocd
+              spec:
+                generators:
+                - git:
+                    repoURL: https://github.com/irizzante/management-cluster.git
+                    revision: HEAD
+                    directories:
+                    - path: cluster-addons/*
+                template:
+                  metadata:
+                    name: '{{path.basename}}'
+                  spec:
+                    project: default
+                    source:
+                      repoURL: https://github.com/irizzante/management-cluster.git
+                      targetRevision: HEAD
+                      path: '{{path}}'
+                    destination:
+                      server: https://kubernetes.default.svc
+                      namespace: '{{path.basename}}'
+                    syncPolicy:
+                      automated:
+                        selfHeal: true
+                        prune: true
+                        allowEmpty: true
+                      syncOptions:
+                      - PruneLast=true
+      patches:
+      - type: CombineFromComposite
+        policy:
+          fromFieldPath: Required
+        toFieldPath: metadata.name
+        combine:
+          variables:
+            - fromFieldPath: metadata.name
+          strategy: string
+          string:
+            fmt: "%s-argocd-platform-applicationset"

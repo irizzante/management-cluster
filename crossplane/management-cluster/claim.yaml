@@ -1,0 +1,5 @@
+apiVersion: irizzant.it/v1alpha1
+kind: ManagementClusterApps
+metadata:
+    name: test
+spec: {}
