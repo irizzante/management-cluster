@@ -1,0 +1,8 @@
+apiVersion: irizzant.it/v1alpha1
+kind: GitOps
+metadata:
+    name: gitops
+spec:
+    providerConfigName:
+        helm: helm-provider
+        kubernetes: kubernetes-provider

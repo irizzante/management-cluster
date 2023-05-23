@@ -1,0 +1,36 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xgitops.irizzant.it
+spec:
+  group: irizzant.it
+  names:
+    kind: XGitOps
+    plural: xgitops
+  claimNames:
+    kind: GitOps
+    plural: gitops
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              providerConfigName:
+                type: object
+                properties:
+                  helm:
+                    type: string
+                  kubernetes:
+                    type: string
+                description: Name of a ProviderConfig to use
+                required:
+                  - helm
+                  - kubernetes
+            required:
+            - providerConfigName
