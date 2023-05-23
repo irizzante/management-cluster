@@ -1,0 +1,5 @@
+provider:
+  packages:
+  - crossplane/provider-kubernetes:main
+  - crossplanecontrib/provider-helm:master
+  - xpkg.upbound.io/upbound/provider-aws:v0.35.0
