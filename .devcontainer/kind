@@ -67,10 +67,11 @@ helm repo add crossplane-stable https://charts.crossplane.io/stable
 helm repo update
 helm install crossplane \
 --namespace crossplane-system \
---create-namespace crossplane-stable/crossplane \
+--create-namespace \
+-f /workspaces/management-cluster/crossplane-values.yaml \
+crossplane-stable/crossplane \
 --wait
 
 kubectl wait --for condition=ready pod --namespace crossplane-system --all
 
-SA=$(kubectl -n crossplane-system get sa -o name | grep provider-helm | sed -e 's|serviceaccount\/|crossplane-system:|g')
-kubectl create clusterrolebinding provider-helm-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"
+kubectl -n crossplane-system create secret generic cluster-config --from-file kubeconfig=~/.kube/config
