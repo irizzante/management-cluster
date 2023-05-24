@@ -1,15 +1,15 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xmanagementclusterapps.irizzant.it
+  name: xlocalgitops.irizzant.it
 spec:
   group: irizzant.it
   names:
-    kind: XManagementClusterApps
-    plural: xmanagementclusterapps
+    kind: XLocalGitops
+    plural: xlocalgitops
   claimNames:
-    kind: ManagementClusterApps
-    plural: managementclusterapps
+    kind: LocalGitops
+    plural: localgitops
   versions:
   - name: v1alpha1
     served: true

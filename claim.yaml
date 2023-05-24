@@ -1,5 +1,5 @@
 apiVersion: irizzant.it/v1alpha1
-kind: ManagementClusterApps
+kind: LocalGitops
 metadata:
-    name: test
+    name: local-gitops
 spec: {}

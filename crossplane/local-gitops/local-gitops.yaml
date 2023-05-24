@@ -1,12 +1,12 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: xmanagementclusterapps.irizzant.it
+  name: xlocalgitops.irizzant.it
 spec:
   writeConnectionSecretsToNamespace: crossplane-system
   compositeTypeRef:
     apiVersion: irizzant.it/v1alpha1
-    kind: XManagementClusterApps
+    kind: XLocalGitops
   resources:
     - name: sealed-secrets
       base:
