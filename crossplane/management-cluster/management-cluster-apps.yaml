@@ -223,6 +223,7 @@ spec:
                       syncOptions:
                       - PruneLast=true
                       - CreateNamespace=true
+                      - ServerSideApply=true
       patches:
       - type: CombineFromComposite
         policy:
