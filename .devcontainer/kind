@@ -74,4 +74,27 @@ crossplane-stable/crossplane \
 
 kubectl wait --for condition=ready pod --namespace crossplane-system --all
 
-kubectl -n crossplane-system create secret generic cluster-config --from-file kubeconfig=~/.kube/config
+SA=$(kubectl -n crossplane-system get sa -o name | grep provider-kubernetes | sed -e 's|serviceaccount\/|crossplane-system:|g')
+kubectl create clusterrolebinding provider-kubernetes-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"
+
+SA=$(kubectl -n crossplane-system get sa -o name | grep provider-helm | sed -e 's|serviceaccount\/|crossplane-system:|g')
+kubectl create clusterrolebinding provider-helm-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"
+
+cat << EOF | kubectl apply -f-
+apiVersion: helm.crossplane.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: helm-provider
+spec:
+  credentials:
+    source: InjectedIdentity
+EOF
+cat << EOF | kubectl apply -f-
+apiVersion: kubernetes.crossplane.io/v1alpha1
+kind: ProviderConfig
+metadata:
+  name: kubernetes-provider
+spec:
+  credentials:
+    source: InjectedIdentity
+EOF
