@@ -1,12 +1,23 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: xlocalgitops.irizzant.it
+  name: xgitops.irizzant.it
 spec:
   writeConnectionSecretsToNamespace: crossplane-system
   compositeTypeRef:
     apiVersion: irizzant.it/v1alpha1
-    kind: XLocalGitops
+    kind: XGitOps
+
+  patchSets:
+    - name: helm-provider-ref
+      patches:
+      - fromFieldPath: spec.providerConfigName.helm
+        toFieldPath: spec.providerConfigRef.name
+    - name: kubernetes-provider-ref
+      patches:
+      - fromFieldPath: spec.providerConfigName.kubernetes
+        toFieldPath: spec.providerConfigRef.name
+        
   resources:
     - name: sealed-secrets
       base:
@@ -17,14 +28,17 @@ spec:
             crossplane.io/external-name: sealed-secrets
         spec:
           providerConfigRef:
-            name: helm-provider
+            name: #patched
           forProvider:
             chart:
               name: sealed-secrets
               repository: https://bitnami-labs.github.io/sealed-secrets/
               version: 2.9.0
             namespace: kube-system
+
       patches:
+      - type: PatchSet
+        patchSetName: helm-provider-ref
       - type: CombineFromComposite
         policy:
           fromFieldPath: Required
@@ -35,6 +49,7 @@ spec:
           strategy: string
           string:
             fmt: "%s-sealed-secrets"
+
     - name: argocd-chart
       base:
         apiVersion: helm.crossplane.io/v1beta1
@@ -44,7 +59,7 @@ spec:
             crossplane.io/external-name: argocd
         spec:
           providerConfigRef:
-            name: helm-provider
+            name: #patched
           forProvider:
             chart:
               name: argo-cd
@@ -55,7 +70,10 @@ spec:
               configs:
                 cm:
                   application.resourceTrackingMethod: annotation
+
       patches:
+      - type: PatchSet
+        patchSetName: helm-provider-ref
       - type: CombineFromComposite
         policy:
           fromFieldPath: Required
@@ -66,6 +84,7 @@ spec:
           strategy: string
           string:
             fmt: "%s-argocd"
+
     - name: argocd-repository-credentials
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
@@ -73,6 +92,8 @@ spec:
         metadata:
           name: #patched
         spec:
+          providerConfigRef:
+            name: #patched
           forProvider:
             manifest:
               apiVersion: bitnami.com/v1alpha1
@@ -92,9 +113,10 @@ spec:
                       argocd.argoproj.io/secret-type: repo-creds
                     name: argocd-repository-credentials
                     namespace: argocd
-          providerConfigRef:
-            name: kubernetes-provider
+
       patches:
+      - type: PatchSet
+        patchSetName: kubernetes-provider-ref
       - type: CombineFromComposite
         policy:
           fromFieldPath: Required
@@ -105,6 +127,7 @@ spec:
           strategy: string
           string:
             fmt: "%s-argocd-repository-credentials"
+
     - name: argocd-repository
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
@@ -112,6 +135,8 @@ spec:
         metadata:
           name: #patched
         spec:
+          providerConfigRef:
+            name: #patched
           forProvider:
             manifest:
               apiVersion: bitnami.com/v1alpha1
@@ -131,9 +156,10 @@ spec:
                       argocd.argoproj.io/secret-type: repository
                     name: irizzante-repo
                     namespace: argocd
-          providerConfigRef:
-            name: kubernetes-provider
+
       patches:
+      - type: PatchSet
+        patchSetName: kubernetes-provider-ref
       - type: CombineFromComposite
         policy:
           fromFieldPath: Required
@@ -144,13 +170,14 @@ spec:
           strategy: string
           string:
             fmt: "%s-argocd-repository"
+
     - name: argocd-project
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
         kind: Object
         spec:
           providerConfigRef:
-            name: kubernetes-provider
+            name: #patched
           forProvider:
             manifest:
               apiVersion: argoproj.io/v1alpha1
@@ -171,7 +198,10 @@ spec:
                 namespaceResourceWhitelist:
                 - group: '*'
                   kind: '*'
+
       patches:
+      - type: PatchSet
+        patchSetName: kubernetes-provider-ref
       - type: CombineFromComposite
         policy:
           fromFieldPath: Required
@@ -182,13 +212,14 @@ spec:
           strategy: string
           string:
             fmt: "%s-argocd-platform-project"
+
     - name: argocd-application-set
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
         kind: Object
         spec:
           providerConfigRef:
-            name: kubernetes-provider
+            name: #patched
           forProvider:
             manifest:
               apiVersion: argoproj.io/v1alpha1
@@ -224,7 +255,10 @@ spec:
                       - PruneLast=true
                       - CreateNamespace=true
                       - ServerSideApply=true
+
       patches:
+      - type: PatchSet
+        patchSetName: kubernetes-provider-ref
       - type: CombineFromComposite
         policy:
           fromFieldPath: Required

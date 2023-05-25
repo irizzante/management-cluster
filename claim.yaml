@@ -1,5 +1,8 @@
 apiVersion: irizzant.it/v1alpha1
-kind: LocalGitops
+kind: GitOps
 metadata:
-    name: local-gitops
-spec: {}
+    name: gitops
+spec:
+    providerConfigName:
+        helm: helm-provider
+        kubernetes: kubernetes-provider
