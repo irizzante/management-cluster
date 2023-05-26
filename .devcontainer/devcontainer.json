@@ -14,7 +14,8 @@
 		"ghcr.io/devcontainers-contrib/features/argo-cd:1": {},
 		"ghcr.io/gickis/devcontainer-features/kubeseal:1": {},
 		"ghcr.io/devcontainers-contrib/features/kind:1": {},
-		"ghcr.io/devcontainers/features/azure-cli:1": {}
+		"ghcr.io/devcontainers/features/azure-cli:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
@@ -26,7 +27,8 @@
 		"vscode": {
 			"extensions": [
 				"eamodio.gitlens",
-				"ms-azuretools.vscode-docker"
+				"ms-azuretools.vscode-docker",
+				"GitHub.vscode-pull-request-github"
 			]
 		}
 	}
