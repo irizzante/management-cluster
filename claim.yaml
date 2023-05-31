@@ -3,6 +3,8 @@ kind: GitOps
 metadata:
     name: gitops
 spec:
+    gitOpsRepo: https://github.com/irizzante/management-cluster.git
+    gitOpsPath: management
     providerConfigName:
         helm: helm-provider
         kubernetes: kubernetes-provider
