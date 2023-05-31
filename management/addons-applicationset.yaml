@@ -12,7 +12,7 @@ spec:
       - path: cluster-addons/management/*
   template:
     metadata:
-      name: '{{path}}'
+      name: '{{path.basename}}'
     spec:
       project: default
       source:
