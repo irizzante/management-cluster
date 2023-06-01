@@ -1,4 +1,7 @@
-grafana:
-  ingress:
-    hosts:
-    - prometheus.management.example.com
+alertmanager:
+  alertmanagerSpec:
+    replicas: 3
+
+prometheus:
+  prometheusSpec:
+    replicas: 3
