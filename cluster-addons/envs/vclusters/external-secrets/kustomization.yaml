@@ -2,16 +2,16 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- ../../base/prometheus
+- ../../../base/external-secrets
 
 components:
-  - ../../variants/non-prod/prometheus
+- ../../../variants/non-prod/external-secrets
 
 patches:
 - patch: |-
     - op: add
       path: /spec/sources/0/helm/valueFiles/-
-      value: $values/cluster-addons/management/prometheus/values-vclusters.yaml
+      value: $values/cluster-addons/envs/management/external-secrets/values-vclusters.yaml
   target:
     kind: Application
-    name: prometheus
+    name: external-secrets

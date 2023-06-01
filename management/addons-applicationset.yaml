@@ -9,7 +9,7 @@ spec:
       repoURL: https://github.com/irizzante/management-cluster.git
       revision: HEAD
       directories:
-      - path: cluster-addons/management/*
+      - path: cluster-addons/envs/management/*
   template:
     metadata:
       name: 'addon-{{path.basename}}'

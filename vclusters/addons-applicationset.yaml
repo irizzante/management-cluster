@@ -9,7 +9,7 @@ spec:
       repoURL: https://github.com/irizzante/management-cluster.git
       revision: HEAD
       directories:
-      - path: cluster-addons/vclusters/*
+      - path: cluster-addons/envs/vclusters/*
   template:
     metadata:
       name: '{{path[0]}}'
