@@ -15,14 +15,15 @@
 		"ghcr.io/gickis/devcontainer-features/kubeseal:1": {},
 		"ghcr.io/devcontainers-contrib/features/kind:1": {},
 		"ghcr.io/devcontainers/features/azure-cli:1": {},
-		"ghcr.io/devcontainers/features/github-cli:1": {}
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/rio/features/kustomize:1": {}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "kubectl version",
 	// Use 'postStartCommand' to run commands after the container is created like starting minikube.
-	"postStartCommand": "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH",
+	"postStartCommand": "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH ; ./kind",
 	"customizations": {
 		"vscode": {
 			"extensions": [

@@ -9,3 +9,11 @@ patches:
   target:
     kind: Application
     name: external-secrets
+- path: version.yaml
+  target:
+    kind: Application
+    name: external-secrets
+- path: group-id-prod.yaml
+  target:
+    kind: ClusterSecretStore
+    name: vclusters-secret-store

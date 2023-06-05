@@ -15,3 +15,7 @@ patches:
   target:
     kind: Application
     name: external-secrets
+- path: version.yaml
+  target:
+    kind: Application
+    name: external-secrets
