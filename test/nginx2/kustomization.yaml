@@ -8,4 +8,4 @@ patches:
 - path: version.yaml
   target:
     kind: Application
-    name: nginx
+    name: nginx2
