@@ -15,7 +15,7 @@ spec:
       name: 'addon-{{path.basename}}'
       namespace: argocd
     spec:
-      project: default
+      project: platform
       source:
         repoURL: https://github.com/irizzante/management-cluster.git
         targetRevision: HEAD
