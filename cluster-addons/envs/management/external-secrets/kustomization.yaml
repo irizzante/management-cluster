@@ -5,7 +5,7 @@ resources:
 - ../../../base/external-secrets
 
 components:
-- ../../../variants/non-prod/external-secrets
+- ../../../variants/prod/external-secrets
 
 patches:
 - patch: |-
