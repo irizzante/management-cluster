@@ -7,10 +7,10 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
-    namespace: nginx
+    namespace: nginx2
     server: 'https://kubernetes.default.svc'
   source:
-    path: test/nginx
+    path: test/nginx2
     repoURL: 'https://github.com/irizzante/management-cluster.git'
     targetRevision: HEAD
   project: platform
