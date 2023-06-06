@@ -1,3 +1,3 @@
 - op: replace
   path: /spec/sources/0/targetRevision
-  value: 46.4.1
+  value: 46.6.0
