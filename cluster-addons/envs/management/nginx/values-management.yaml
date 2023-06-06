@@ -3,6 +3,10 @@ controller:
     enabled: true
   service:
     type: ClusterIP
+  tolerations:
+  - key: "node-role.kubernetes.io/control-plane:NoSchedule"
+    operator: "Exists"
+    effect: "NoSchedule"
 
   nodeSelector:
     ingress-ready: "true"
