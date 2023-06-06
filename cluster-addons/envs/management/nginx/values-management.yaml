@@ -3,3 +3,6 @@ controller:
     enabled: true
   service:
     type: ClusterIP
+
+  nodeSelector:
+    ingress-ready: true

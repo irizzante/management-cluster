@@ -1,5 +1,4 @@
 controller:
-  replicaCount: 3
   affinity: 
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
