@@ -5,4 +5,4 @@ controller:
     type: ClusterIP
 
   nodeSelector:
-    ingress-ready: true
+    ingress-ready: "true"
