@@ -19,3 +19,10 @@ patches:
   target:
     kind: Application
     name: nginx
+- patch: |-
+    - op: add
+      path: /spec/sources/0/helm/valueFiles/-
+      value: $values/cluster-addons/envs/management/nginx/replicas.yaml
+  target:
+    kind: Application
+    name: nginx
