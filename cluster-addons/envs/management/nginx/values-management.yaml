@@ -1,3 +1,5 @@
 controller:
   hostPort:
     enabled: true
+  service:
+    type: ClusterIP
