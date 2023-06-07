@@ -1,23 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: test
-  namespace: argocd
+  name: minio2
+  annotations:
+    argocd.argoproj.io/sync-wave: "-20"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
-    namespace: nginx
+    namespace: minio2
     server: 'https://kubernetes.default.svc'
   source:
-    path: test/nginx
-    repoURL: 'https://github.com/irizzante/management-cluster.git'
-    targetRevision: HEAD
+    repoURL: 'https://charts.bitnami.com/bitnami'
+    targetRevision: 12.6.4
+    chart: minio
   project: platform
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+    automated: null
     syncOptions:
       - CreateNamespace=true
-      - PruneLast=true
