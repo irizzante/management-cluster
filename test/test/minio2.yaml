@@ -16,6 +16,8 @@ spec:
     chart: minio
   project: platform
   syncPolicy:
-    automated: null
+    automated:
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
