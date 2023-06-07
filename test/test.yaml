@@ -12,7 +12,7 @@ spec:
       - path: test/*
   template:
     metadata:
-      name: '{{path.basename}}'
+      name: 'app-{{path.basename}}'
     spec:
       project: default
       source:
