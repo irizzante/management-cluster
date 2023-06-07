@@ -1,19 +1,24 @@
 apiVersion: argoproj.io/v1alpha1
-kind: Application
+kind: ApplicationSet
 metadata:
-  name: apps
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
+  name: appset
+  namespace: argocd
 spec:
-  destination:
-    namespace: argocd
-    server: 'https://kubernetes.default.svc'
-  source:
-    path: test/test
-    repoURL: 'https://github.com/irizzante/management-cluster.git'
-    targetRevision: HEAD
-  project: platform
-  syncPolicy:
-    automated: null
-    syncOptions:
-      - CreateNamespace=true
+  generators:
+  - git:
+      repoURL: https://github.com/irizzante/management-cluster.git
+      revision: HEAD
+      directories:
+      - path: test/*
+  template:
+    metadata:
+      name: '{{path[0]}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/irizzante/management-cluster.git
+        targetRevision: HEAD
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{path.basename}}'
