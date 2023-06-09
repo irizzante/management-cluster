@@ -1,3 +1,5 @@
-- op: replace
-  path: /spec/sources/0/targetRevision
-  value: 46.3.0
+applications:
+   
+  prometheus:
+    source:
+      targetRevision: 46.4.1

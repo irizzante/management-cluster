@@ -1,0 +1,38 @@
+envName: vclusters
+
+default:
+  app:
+    syncOptions: |
+      - PruneLast=true
+      - CreateNamespace=true
+
+applications:
+  external-secrets:
+    enabled: true
+    destination:
+      namespace: external-secrets
+    source:
+      path: cluster-addons/envs/management/external-secrets
+  
+  nginx:
+    enabled: false
+      
+  prometheus:
+    prometheus:
+    enabled: true
+    destination:
+      namespace: monitoring
+    sources: |
+      - repoURL: 'https://prometheus-community.github.io/helm-charts'
+        targetRevision: 46.4.1
+        chart: kube-prometheus-stack
+        helm:
+          valueFiles:
+          - $values/cluster-addons/base/prometheus/values.yaml
+          - $values/cluster-addons/variants/non-prod/prometheus/values-non-prod.yaml
+          - $values/cluster-addons/envs/{{ $.Values.envName }}/prometheus/values-{{ $.Values.envName }}.yaml
+      - repoURL: 'https://github.com/irizzante/management-cluster.git'
+        targetRevision: main
+        ref: values
+    source:
+      targetRevision: 46.4.1

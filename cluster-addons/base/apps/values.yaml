@@ -1,4 +1,4 @@
-envName: management
+envName: null
 
 default:
   app:
@@ -8,10 +8,6 @@ default:
     source:
       repoURL: https://github.com/irizzante/management-cluster.git
       targetRevision: HEAD
-      extraSourceFields: |
-        helm:
-          valueFiles:
-          - {{ $.Values.envName }}-values.yaml
     enableAutoSync: true
     selfHeal: true
     autoSyncPrune: true
@@ -31,3 +27,7 @@ applications:
     enabled: true
     destination:
       namespace: monitoring
+    syncOptions: |
+      - PruneLast=true
+      - CreateNamespace=true
+      - ServerSideApply=true

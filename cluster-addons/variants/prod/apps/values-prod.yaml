@@ -1,5 +1,4 @@
 applications:
-   
   nginx:
     source:
       targetRevision: 4.7.0

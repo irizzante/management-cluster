@@ -1,0 +1,11 @@
+{
+  _config:: {
+
+    applications: {
+    },
+
+    projects: {
+    },
+
+  },
+}
