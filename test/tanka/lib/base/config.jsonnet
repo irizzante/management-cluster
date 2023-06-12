@@ -130,6 +130,37 @@ local application = argoCd.argoproj.v1alpha1.application;
         ],
       },
 
+      clusterStore: {
+        enabled: true,
+        annotations: {
+        },
+        finalizers: [
+          'resources - finalizer.argocd.argoproj.io',
+        ],
+        project: 'platform',
+        destination: {
+          namespace: 'external-secrets',
+        },
+        syncPolicy: {
+          allowEmpty: true,
+          selfHeal: true,
+          prune: true,
+        },
+        syncOptions: [
+          'CreateNamespace=true',
+          'PruneLast=true',
+        ],
+        valuesRepo: {
+          repoURL: 'https://github.com/irizzante/management-cluster.git',
+          ref: 'value',
+          targetRevision: 'main',
+        },
+        targetRevision: 'HEAD',
+        source: application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
+                application.spec.source.withTargetRevision(self.targetRevision) +
+                application.spec.source.withPath('test/tanka/lib/base/cluster-store'),
+      },
+
     },
 
     projects+: {

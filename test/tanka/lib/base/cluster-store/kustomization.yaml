@@ -4,8 +4,3 @@ kind: Kustomization
 resources:
 - clustersecretstore-gitlab.yaml
 
-patches:
-- path: version.yaml
-  target:
-    kind: Application
-    name: external-secrets

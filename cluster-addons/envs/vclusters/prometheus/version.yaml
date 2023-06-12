@@ -1,5 +1,0 @@
-applications:
-   
-  prometheus:
-    source:
-      targetRevision: 46.4.1

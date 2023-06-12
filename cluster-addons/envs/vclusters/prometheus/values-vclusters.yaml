@@ -1,4 +1,0 @@
-grafana:
-  ingress:
-    hosts:
-    - prometheus.management.example.com
