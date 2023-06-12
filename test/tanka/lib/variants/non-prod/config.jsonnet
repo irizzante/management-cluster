@@ -6,27 +6,18 @@
 
       nginx+: {
         valueFiles+: [
-          '$values/test/tanka/lib/variants/' + self.variant + '/nginx/values-' + self.variant + '.yaml',
-          '$values/test/tanka/lib/variants/' + self.variant + '/nginx/values-replicas.yaml',
+          '$values/test/tanka/lib/variants/non-prod/nginx/values-non-prod.yaml',
+          '$values/test/tanka/lib/variants/non-prod/nginx/values-settings.yaml',
         ],
       },
 
       prometheus+: {
         valueFiles+: [
-          '$values/test/tanka/lib/variants/' + self.variant + '/prometheus/values-' + self.variant + '.yaml',
-          '$values/test/tanka/lib/variants/' + self.variant + '/prometheus/values-replicas.yaml',
+          '$values/test/tanka/lib/variants/non-prod/prometheus/values-non-prod.yaml',
+          '$values/test/tanka/lib/variants/non-prod/prometheus/values-settings.yaml',
         ],
       },
 
-    },
-
-  } + {
-
-    applications+: {
-      [app.key]+: {
-        variant: 'non-prod',
-      }
-      for app in std.objectKeysValues(super.applications)
     },
 
   },

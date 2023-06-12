@@ -88,6 +88,48 @@ local application = argoCd.argoproj.v1alpha1.application;
           ).spec.source,
         ],
       },
+
+      externalSecrets: {
+        enabled: true,
+        annotations: {
+          'argocd.argoproj.io/sync-wave': '-10',
+        },
+        finalizers: [
+          'resources - finalizer.argocd.argoproj.io',
+        ],
+        project: 'platform',
+        destination: {
+          namespace: 'external-secrets',
+        },
+        syncPolicy: {
+          allowEmpty: true,
+          selfHeal: true,
+          prune: true,
+        },
+        syncOptions: [
+          'CreateNamespace=true',
+          'PruneLast=true',
+        ],
+        valuesRepo: {
+          repoURL: 'https://github.com/irizzante/management-cluster.git',
+          ref: 'value',
+          targetRevision: 'main',
+        },
+        valueFiles: [
+          '$values/test/tanka/lib/base/external-secrets/values.yaml',
+        ],
+        targetRevision: '',
+        sources: [
+          self.valuesRepo,
+          (
+            application.spec.source.withRepoURL('https://charts.external-secrets.io') +
+            application.spec.source.withTargetRevision(self.targetRevision) +
+            application.spec.source.withChart('external-secrets') +
+            application.spec.source.helm.withValueFiles(self.valueFiles)
+          ).spec.source,
+        ],
+      },
+
     },
 
     projects+: {

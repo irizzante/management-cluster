@@ -1,0 +1,5 @@
+deploymentAnnotations:
+  pod-security.kubernetes.io/enforce: restricted
+  
+podAnnotations:
+  pod-security.kubernetes.io/enforce: restricted
