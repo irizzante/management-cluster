@@ -34,7 +34,6 @@ kind: Installation
 metadata:
   name: default
 spec:
-  registry: maven-repo.sdb.it:18080
   # Configures Calico networking.
   calicoNetwork:
     # Note: The ipPools section cannot be modified post-install.
