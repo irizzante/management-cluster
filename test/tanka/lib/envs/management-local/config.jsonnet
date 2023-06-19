@@ -32,7 +32,7 @@ local application = argoCd.argoproj.v1alpha1.application;
       },
 
       clusterStore+: {
-        spec+: application.spec.source.withPath('envs/management-local/cluster-store/'),
+        source+: application.spec.source.withPath('test/tanka/lib/envs/management-local/cluster-store/'),
       },
 
     },
