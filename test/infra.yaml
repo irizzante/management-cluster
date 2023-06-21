@@ -16,7 +16,7 @@ spec:
     targetRevision: HEAD
     plugin:
       env:
-        name: TK_ENV
+      - name: TK_ENV
         value: management-local
   syncPolicy:
     automated:
