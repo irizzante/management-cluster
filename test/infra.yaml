@@ -17,7 +17,9 @@ spec:
     plugin:
       env:
       - name: TK_ENV
-        value: management-local
+        value: default
+      - name: TK_EXTRA_ARGS
+        value: --name=management-local
   syncPolicy:
     automated:
       allowEmpty: true
