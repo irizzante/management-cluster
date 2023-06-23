@@ -30,7 +30,7 @@ local application = argoCd.argoproj.v1alpha1.application;
         ],
         valuesRepo: {
           repoURL: 'https://github.com/irizzante/management-cluster.git',
-          ref: 'value',
+          ref: 'values',
           targetRevision: 'main',
         },
         valueFiles: [
@@ -71,7 +71,7 @@ local application = argoCd.argoproj.v1alpha1.application;
         ],
         valuesRepo: {
           repoURL: 'https://github.com/irizzante/management-cluster.git',
-          ref: 'value',
+          ref: 'values',
           targetRevision: 'main',
         },
         valueFiles: [
@@ -89,7 +89,7 @@ local application = argoCd.argoproj.v1alpha1.application;
         ],
       },
 
-      externalSecrets: {
+      'external-secrets': {
         enabled: true,
         annotations: {
           'argocd.argoproj.io/sync-wave': '-10',
@@ -112,7 +112,7 @@ local application = argoCd.argoproj.v1alpha1.application;
         ],
         valuesRepo: {
           repoURL: 'https://github.com/irizzante/management-cluster.git',
-          ref: 'value',
+          ref: 'values',
           targetRevision: 'main',
         },
         valueFiles: [
@@ -152,7 +152,7 @@ local application = argoCd.argoproj.v1alpha1.application;
         ],
         valuesRepo: {
           repoURL: 'https://github.com/irizzante/management-cluster.git',
-          ref: 'value',
+          ref: 'values',
           targetRevision: 'main',
         },
         targetRevision: 'HEAD',
