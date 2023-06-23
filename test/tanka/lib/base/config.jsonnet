@@ -13,7 +13,7 @@ local application = argoCd.argoproj.v1alpha1.application;
           'argocd.argoproj.io/sync-wave': '-10',
         },
         finalizers: [
-          'resources - finalizer.argocd.argoproj.io',
+          'resources-finalizer.argocd.argoproj.io',
         ],
         project: 'platform',
         destination: {
@@ -53,7 +53,7 @@ local application = argoCd.argoproj.v1alpha1.application;
         annotations: {
         },
         finalizers: [
-          'resources - finalizer.argocd.argoproj.io',
+          'resources-finalizer.argocd.argoproj.io',
         ],
         project: 'platform',
         destination: {
@@ -95,7 +95,7 @@ local application = argoCd.argoproj.v1alpha1.application;
           'argocd.argoproj.io/sync-wave': '-10',
         },
         finalizers: [
-          'resources - finalizer.argocd.argoproj.io',
+          'resources-finalizer.argocd.argoproj.io',
         ],
         project: 'platform',
         destination: {
@@ -135,7 +135,7 @@ local application = argoCd.argoproj.v1alpha1.application;
         annotations: {
         },
         finalizers: [
-          'resources - finalizer.argocd.argoproj.io',
+          'resources-finalizer.argocd.argoproj.io',
         ],
         project: 'platform',
         destination: {
