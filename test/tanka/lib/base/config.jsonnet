@@ -130,7 +130,7 @@ local application = argoCd.argoproj.v1alpha1.application;
         ],
       },
 
-      clusterStore: {
+      'cluster-store': {
         enabled: true,
         annotations: {
         },
