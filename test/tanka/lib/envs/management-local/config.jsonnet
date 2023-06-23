@@ -24,7 +24,7 @@ local application = argoCd.argoproj.v1alpha1.application;
         ],
       },
 
-      externalSecrets+: {
+      'external-secrets'+: {
         targetRevision: (importstr 'envs/management-local/external-secrets/version.txt'),
         valueFiles+: [
           '$values/test/tanka/lib/envs/management-local/external-secrets/values-settings.yaml',
