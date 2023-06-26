@@ -15,6 +15,5 @@ controller:
         operator: "Exists"
         effect: "NoSchedule"
 
-
   nodeSelector:
     ingress-ready: "true"

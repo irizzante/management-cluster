@@ -1,0 +1,7 @@
+alertmanager:
+  alertmanagerSpec:
+    replicas: 3
+
+prometheus:
+  prometheusSpec:
+    replicas: 3

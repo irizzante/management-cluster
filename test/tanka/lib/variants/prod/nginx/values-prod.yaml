@@ -17,5 +17,3 @@ controller:
             values:
             - controller
         topologyKey: "kubernetes.io/hostname"
-
-  replicaCount: 3
