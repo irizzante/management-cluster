@@ -1,38 +1,11 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/kubernetes-helm-minikube
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
-	"name": "Kubernetes - Minikube-in-Docker",
+	"name": "Ubuntu",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"build": {
-		// Path is relataive to the devcontainer.json file.
-		"dockerfile": "Dockerfile"
-	},
-	"features": {
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
-		"ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
-		"ghcr.io/devcontainers-contrib/features/argo-cd:1": {},
-		"ghcr.io/devcontainers-contrib/features/kind:1": {},
-		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/rio/features/kustomize:1": {}
-	},
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
+	"image": "ghcr.io/irizzante/devcontainer-k8s:main",
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "kubectl version",
-	// Use 'postStartCommand' to run commands after the container is created like starting minikube.
-	"postStartCommand": "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH ; ${containerWorkspaceFolder}/.devcontainer/kind",
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"eamodio.gitlens",
-				"ms-azuretools.vscode-docker",
-				"GitHub.vscode-pull-request-github",
-				"Grafana.vscode-jsonnet"
-			]
-		}
-	}
-	// Configure tool-specific properties.
-	// "customizations": {},
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
-}
+	// "postCreateCommand": "uname -a",
+	"postStartCommand": "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH ; ${containerWorkspaceFolder}/.devcontainer/kind"
+  }
+  
