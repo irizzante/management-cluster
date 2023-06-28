@@ -34,7 +34,7 @@ local application = argoCd.argoproj.v1alpha1.application;
           targetRevision: 'main',
         },
         valueFiles: [
-          '$values/test/tanka/lib/base/nginx/values.yaml',
+          '$values/apps/lib/base/nginx/values.yaml',
         ],
         targetRevision: '',
         sources: [
@@ -75,7 +75,7 @@ local application = argoCd.argoproj.v1alpha1.application;
           targetRevision: 'main',
         },
         valueFiles: [
-          '$values/test/tanka/lib/base/prometheus/values.yaml',
+          '$values/apps/lib/base/prometheus/values.yaml',
         ],
         targetRevision: '',
         sources: [
@@ -116,7 +116,7 @@ local application = argoCd.argoproj.v1alpha1.application;
           targetRevision: 'main',
         },
         valueFiles: [
-          '$values/test/tanka/lib/base/external-secrets/values.yaml',
+          '$values/apps/lib/base/external-secrets/values.yaml',
         ],
         targetRevision: '',
         sources: [
@@ -158,7 +158,7 @@ local application = argoCd.argoproj.v1alpha1.application;
         targetRevision: 'HEAD',
         source: application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
                 application.spec.source.withTargetRevision(self.targetRevision) +
-                application.spec.source.withPath('test/tanka/lib/base/cluster-store'),
+                application.spec.source.withPath('apps/lib/base/cluster-store'),
       },
 
     },

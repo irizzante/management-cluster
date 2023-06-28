@@ -6,13 +6,13 @@
 
       nginx+: {
         valueFiles+: [
-          '$values/test/tanka/lib/variants/non-prod/nginx/values-replicas.yaml',
+          '$values/apps/lib/variants/non-prod/nginx/values-replicas.yaml',
         ],
       },
 
       prometheus+: {
         valueFiles+: [
-          '$values/test/tanka/lib/variants/non-prod/prometheus/values-replicas.yaml',
+          '$values/apps/lib/variants/non-prod/prometheus/values-replicas.yaml',
         ],
       },
 

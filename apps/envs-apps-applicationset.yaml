@@ -9,7 +9,7 @@ spec:
       repoURL: https://github.com/irizzante/management-cluster.git
       revision: HEAD
       directories:
-      - path: test/tanka/lib/envs/*
+      - path: apps/lib/envs/*
   template:
     metadata:
       name: '{{path.basename}}'
@@ -19,7 +19,7 @@ spec:
         server: https://kubernetes.default.svc
       project: platform
       source:
-        path: test/tanka/
+        path: apps/
         repoURL: https://github.com/irizzante/management-cluster.git
         targetRevision: HEAD
         plugin:

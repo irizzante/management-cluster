@@ -6,7 +6,7 @@
 
       nginx+: {
         valueFiles+: [
-          '$values/test/tanka/lib/variants/local/nginx/values-local.yaml',
+          '$values/apps/lib/variants/local/nginx/values-local.yaml',
         ],
       },
 
