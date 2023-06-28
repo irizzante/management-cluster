@@ -7,6 +7,39 @@ local application = argoCd.argoproj.v1alpha1.application;
 
     applications+: {
 
+      local helmAppTemplate = {
+        enabled: true,
+        annotations: {
+        },
+        finalizers: [
+          'resources-finalizer.argocd.argoproj.io',
+        ],
+        project: 'platform',
+        destination: {
+          namespace: '',
+        },
+        syncPolicy: {
+          allowEmpty: true,
+          selfHeal: true,
+          prune: true,
+        },
+        syncOptions: [
+          'CreateNamespace=true',
+          'PruneLast=true',
+        ],
+        valuesRepo: {
+          repoURL: 'https://github.com/irizzante/management-cluster.git',
+          ref: 'values',
+          targetRevision: 'main',
+        },
+        valueFiles: [
+        ],
+        targetRevision: '',
+        sources: [
+          self.valuesRepo,
+        ],
+      },
+
       nginx: {
         enabled: true,
         annotations: {
@@ -161,6 +194,22 @@ local application = argoCd.argoproj.v1alpha1.application;
                 application.spec.source.withPath('apps/lib/base/cluster-store'),
       },
 
+      argocd: helmAppTemplate {
+        destination: {
+          namespace: 'argocd',
+        },
+        valueFiles+: [
+          '$values/apps/lib/base/argocd/values.yaml',
+        ],
+        sources+: [
+          (
+            application.spec.source.withRepoURL('https://argoproj.github.io/argo-helm') +
+            application.spec.source.withTargetRevision(self.targetRevision) +
+            application.spec.source.withChart('argo-cd') +
+            application.spec.source.helm.withValueFiles(self.valueFiles)
+          ).spec.source,
+        ],
+      },
     },
 
     projects+: {

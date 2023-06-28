@@ -1,0 +1,56 @@
+repoServer:
+  extraContainers:
+  - name: cmp-tanka
+    image: curlimages/curl
+    command: ['sh', '-c', 'curl -Lo /home/argocd/cmp-server/plugins/jb https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-amd64 && curl -Lo /home/argocd/cmp-server/plugins/tk https://github.com/grafana/tanka/releases/download/v0.25.0/tk-linux-amd64 && chmod +x /home/argocd/cmp-server/plugins/jb && chmod +x /home/argocd/cmp-server/plugins/tk && /var/run/argocd/argocd-cmp-server']  
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+    volumeMounts:
+    - mountPath: /var/run/argocd
+      name: var-files
+    - mountPath: /home/argocd/cmp-server/plugins
+      name: plugins
+    - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+      subPath: tanka.yaml
+      name: argocd-cmp-cm
+    - mountPath: /tmp
+      name: cmp-tmp
+
+  volumes:
+  - name: argocd-cmp-cm
+    configMap:
+      name: argocd-cmp-cm
+  - name: cmp-tmp
+    emptyDir: {}
+
+configs:
+  cmp:
+    create: true
+    plugins:
+      tanka:
+        version: v1.0
+        init:
+          command: ['sh', '-c', '/home/argocd/cmp-server/plugins/jb install']
+        generate:
+          command:  [ 'sh', '-c', '/home/argocd/cmp-server/plugins/tk show environments/${ARGOCD_ENV_TK_ENV} ${ARGOCD_ENV_TK_EXTRA_ARGS} --dangerous-allow-redirect']
+        discover:
+          fileName: "**/k.libsonnet"
+
+  cm:
+    application.resourceTrackingMethod: annotation
+    resource.customizations: |
+      argoproj.io/Application:
+        health.lua: |
+          hs = {}
+          hs.status = "Progressing"
+          hs.message = ""
+          if obj.status ~= nil then
+            if obj.status.health ~= nil then
+              hs.status = obj.status.health.status
+              if obj.status.health.message ~= nil then
+                hs.message = obj.status.health.message
+              end
+            end
+          end
+          return hs
