@@ -195,6 +195,9 @@ local application = argoCd.argoproj.v1alpha1.application;
       },
 
       argocd: helmAppTemplate {
+        annotations: {
+          'argocd.argoproj.io/sync-wave': '-10',
+        },
         destination: {
           namespace: 'argocd',
         },
