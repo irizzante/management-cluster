@@ -10,6 +10,12 @@
         ],
       },
 
+      'metrics-server'+: {
+        valueFiles+: [
+          '$values/apps/lib/variants/local/metrics-server/values-local.yaml',
+        ],
+      },
+
     },
 
   },
