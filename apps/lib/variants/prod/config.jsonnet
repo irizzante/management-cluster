@@ -21,8 +21,8 @@
         valueFiles+: [
           '$values/apps/lib/variants/prod/argocd/values-prod.yaml',
           '$values/apps/lib/variants/prod/argocd/values-replicas.yaml',
-        ]
-      }
+        ],
+      },
 
     },
 

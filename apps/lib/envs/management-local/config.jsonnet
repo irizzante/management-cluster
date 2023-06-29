@@ -32,6 +32,10 @@ local application = argoCd.argoproj.v1alpha1.application;
         source+: application.spec.source.withPath('apps/lib/envs/management-local/cluster-store/'),
       },
 
+      argocd+: {
+        targetRevision: (importstr 'envs/management-local/argocd/version.txt'),
+      },
+
     },
 
   },
