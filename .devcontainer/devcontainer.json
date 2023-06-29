@@ -6,6 +6,13 @@
 	"image": "ghcr.io/irizzante/devcontainer-k8s:main",
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "uname -a",
-	"postStartCommand": "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH ; ${containerWorkspaceFolder}/.devcontainer/kind"
+	"postStartCommand": "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH ; ${containerWorkspaceFolder}/.devcontainer/kind",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"Grafana.vscode-jsonnet"
+			]
+		}
+	}
   }
   
