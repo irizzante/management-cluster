@@ -1,0 +1,9 @@
+global:
+  affinity:
+    topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: DoNotSchedule
+
+redis-ha:
+  enabled: true
