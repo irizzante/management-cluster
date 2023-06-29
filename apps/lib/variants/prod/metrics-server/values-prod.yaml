@@ -1,0 +1,14 @@
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+addonResizer:
+  enabled: true
+
+topologySpreadConstraints:
+- maxSkew: 1
+  topologyKey: topology.kubernetes.io/zone
+  whenUnsatisfiable: DoNotSchedule
+- maxSkew: 1
+  topologyKey: kubernetes.io/hostname
+  whenUnsatisfiable: DoNotSchedule

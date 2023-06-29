@@ -213,6 +213,27 @@ local application = argoCd.argoproj.v1alpha1.application;
           ).spec.source,
         ],
       },
+
+      'metrics-server': helmAppTemplate {
+        annotations: {
+          'argocd.argoproj.io/sync-wave': '-30',
+        },
+        destination: {
+          namespace: 'kube-system',
+        },
+        valueFiles+: [
+          '$values/apps/lib/base/metrics-server/values.yaml',
+        ],
+        sources+: [
+          (
+            application.spec.source.withRepoURL('https://kubernetes-sigs.github.io/metrics-server') +
+            application.spec.source.withTargetRevision(self.targetRevision) +
+            application.spec.source.withChart('metrics-server') +
+            application.spec.source.helm.withValueFiles(self.valueFiles)
+          ).spec.source,
+        ],
+      },
+
     },
 
     projects+: {

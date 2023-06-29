@@ -38,6 +38,13 @@ local application = argoCd.argoproj.v1alpha1.application;
           '$values/apps/lib/envs/management-local/argocd/values-replicas.yaml',
         ],
       },
+      
+      'metrics-server'+: {
+        targetRevision: (importstr 'envs/management-local/metrics-server/version.txt'),
+        valueFiles+: [
+          '$values/apps/lib/envs/management-local/metrics-server/values-replicas.yaml',
+        ],
+      },
 
     },
 

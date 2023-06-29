@@ -24,6 +24,13 @@
         ],
       },
 
+      'metrics-server'+: {
+        valueFiles+: [
+          '$values/apps/lib/variants/prod/metrics-server/values-prod.yaml',
+          '$values/apps/lib/variants/prod/metrics-server/values-replicas.yaml',
+        ],
+      },
+
     },
 
   },
