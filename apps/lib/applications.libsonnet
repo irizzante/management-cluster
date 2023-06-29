@@ -5,7 +5,12 @@ local project = argoCd.argoproj.v1alpha1.appProject;
 {
 
   applications: {
-    [app.key]: application.new(app.key) +
+    [app.key]: (
+                 if std.length($._config.appNameSuffix) > 0 then
+                   application.new(app.key + '-' + $._config.appNameSuffix)
+                 else
+                   application.new(app.key)
+               ) +
                application.metadata.withAnnotations(app.value.annotations) +
                application.metadata.withFinalizers(app.value.finalizers) +
                application.metadata.withNamespace('argocd') +
