@@ -125,11 +125,6 @@ local application = argoCd.argoproj.v1alpha1.application;
           'CreateNamespace=true',
           'PruneLast=true',
         ],
-        valuesRepo: {
-          repoURL: 'https://github.com/irizzante/management-cluster.git',
-          ref: 'values',
-          targetRevision: 'main',
-        },
         targetRevision: 'HEAD',
         source: application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
                 application.spec.source.withTargetRevision(self.targetRevision) +
