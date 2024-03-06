@@ -40,38 +40,17 @@ local application = argoCd.argoproj.v1alpha1.application;
         ],
       },
 
-      nginx: {
-        enabled: true,
-        annotations: {
+      nginx: helmAppTemplate {
+        annotations+: {
           'argocd.argoproj.io/sync-wave': '-10',
         },
-        finalizers: [
-          'resources-finalizer.argocd.argoproj.io',
-        ],
-        project: 'platform',
-        destination: {
+        destination+: {
           namespace: 'nginx',
         },
-        syncPolicy: {
-          allowEmpty: true,
-          selfHeal: true,
-          prune: true,
-        },
-        syncOptions: [
-          'CreateNamespace=true',
-          'PruneLast=true',
-        ],
-        valuesRepo: {
-          repoURL: 'https://github.com/irizzante/management-cluster.git',
-          ref: 'values',
-          targetRevision: 'main',
-        },
-        valueFiles: [
+        valueFiles+: [
           '$values/apps/lib/base/nginx/values.yaml',
         ],
-        targetRevision: '',
-        sources: [
-          self.valuesRepo,
+        sources+: [
           (
             application.spec.source.withRepoURL('https://kubernetes.github.io/ingress-nginx') +
             application.spec.source.withTargetRevision(self.targetRevision) +
@@ -81,38 +60,17 @@ local application = argoCd.argoproj.v1alpha1.application;
         ],
       },
 
-      prometheus: {
-        enabled: true,
-        annotations: {
-        },
-        finalizers: [
-          'resources-finalizer.argocd.argoproj.io',
-        ],
-        project: 'platform',
-        destination: {
+      prometheus: helmAppTemplate {
+        destination+: {
           namespace: 'prometheus',
         },
-        syncPolicy: {
-          allowEmpty: true,
-          selfHeal: true,
-          prune: true,
-        },
-        syncOptions: [
-          'CreateNamespace=true',
-          'PruneLast=true',
+        syncOptions+: [
           'ServerSideApply=true',
         ],
-        valuesRepo: {
-          repoURL: 'https://github.com/irizzante/management-cluster.git',
-          ref: 'values',
-          targetRevision: 'main',
-        },
-        valueFiles: [
+        valueFiles+: [
           '$values/apps/lib/base/prometheus/values.yaml',
         ],
-        targetRevision: '',
-        sources: [
-          self.valuesRepo,
+        sources+: [
           (
             application.spec.source.withRepoURL('https://prometheus-community.github.io/helm-charts') +
             application.spec.source.withTargetRevision(self.targetRevision) +
@@ -122,38 +80,22 @@ local application = argoCd.argoproj.v1alpha1.application;
         ],
       },
 
-      'external-secrets': {
-        enabled: true,
-        annotations: {
+      'external-secrets': helmAppTemplate {
+        annotations+: {
           'argocd.argoproj.io/sync-wave': '-10',
         },
-        finalizers: [
-          'resources-finalizer.argocd.argoproj.io',
-        ],
-        project: 'platform',
-        destination: {
+        destination+: {
           namespace: 'external-secrets',
         },
-        syncPolicy: {
-          allowEmpty: true,
-          selfHeal: true,
-          prune: true,
-        },
-        syncOptions: [
-          'CreateNamespace=true',
-          'PruneLast=true',
-        ],
-        valuesRepo: {
+        valuesRepo+: {
           repoURL: 'https://github.com/irizzante/management-cluster.git',
           ref: 'values',
           targetRevision: 'main',
         },
-        valueFiles: [
+        valueFiles+: [
           '$values/apps/lib/base/external-secrets/values.yaml',
         ],
-        targetRevision: '',
-        sources: [
-          self.valuesRepo,
+        sources+: [
           (
             application.spec.source.withRepoURL('https://charts.external-secrets.io') +
             application.spec.source.withTargetRevision(self.targetRevision) +
