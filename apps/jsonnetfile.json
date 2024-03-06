@@ -13,6 +13,24 @@
     {
       "source": {
         "git": {
+          "remote": "https://github.com/grafana/jsonnet-libs.git",
+          "subdir": "tanka-util"
+        }
+      },
+      "version": "master"
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/irizzante/argocd-apps-jsonnet.git",
+          "subdir": ""
+        }
+      },
+      "version": "main"
+    },
+    {
+      "source": {
+        "git": {
           "remote": "https://github.com/jsonnet-libs/argo-cd-libsonnet.git",
           "subdir": "2.5"
         }
@@ -36,15 +54,6 @@
         }
       },
       "version": "main"
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/grafana/jsonnet-libs.git",
-          "subdir": "tanka-util"
-        }
-      },
-      "version": "master"
     }
   ],
   "legacyImports": true

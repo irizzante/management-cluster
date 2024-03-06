@@ -8,7 +8,7 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "fe2c78b6090156abcb877a4feb9bd288aef79118",
+      "version": "84e49c8549fa472c963862f233422c8b368afabe",
       "sum": "0y3AFX9LQSpfWTxWKSwoLgbt0Wc9nnCwhMH2szKzHv0="
     },
     {
@@ -18,8 +18,18 @@
           "subdir": "tanka-util"
         }
       },
-      "version": "fe2c78b6090156abcb877a4feb9bd288aef79118",
+      "version": "84e49c8549fa472c963862f233422c8b368afabe",
       "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/irizzante/argocd-apps-jsonnet.git",
+          "subdir": ""
+        }
+      },
+      "version": "693b9fc831337ada7654c0dd4409158ba874d287",
+      "sum": "OEhkYNdhrsJhszMhQBueofVfu2yV3qpgoFAr5hEvo/c="
     },
     {
       "source": {
@@ -28,7 +38,7 @@
           "subdir": "2.5"
         }
       },
-      "version": "dfc0d23aea49294f4fe484552ee992aca230208f",
+      "version": "9478cf16ac1e67b7a96fc362ddd268afa9c8e142",
       "sum": "/KFlJos2fHzwmoCFrMjmB0ZuWu+Rcbly7TKNC1UsW6c="
     },
     {
@@ -38,8 +48,8 @@
           "subdir": "doc-util"
         }
       },
-      "version": "ff76f6d8edde6366c6dcf81a356481b0e344566b",
-      "sum": "OxjkWDF0oHmwV52hhyoFW3bwtwgke8s/EOPNRiICPTI="
+      "version": "6ac6c69685b8c29c54515448eaca583da2d88150",
+      "sum": "BrAL/k23jq+xy9oA7TWIhUx07dsA/QLm3g7ktCwe//U="
     },
     {
       "source": {
@@ -48,8 +58,8 @@
           "subdir": "1.26"
         }
       },
-      "version": "a0779420abf73f90167d449a9e527319ced7d134",
-      "sum": "q6ZaBe1Ciob0O3QbLqtEfOnCGt5rsv5A9RCFN3+Ex/I="
+      "version": "bf9a62cfd32a58c071b8410bfcdec058475dd25e",
+      "sum": "fLShxv/gGx8+Jay43Kb0hjvGXCrwJ+2XJ1Hoir2yBZM="
     }
   ],
   "legacyImports": false

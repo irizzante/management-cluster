@@ -67,33 +67,78 @@ crossplane-stable/crossplane \
 
 kubectl wait --for condition=ready pod --namespace crossplane-system --all
 
-kubectl apply -f https://raw.githubusercontent.com/irizzante/crossplane/main/crossplane/configurations/gitops.yaml
-
 sleep 10
 
 kubectl wait --for condition=ready pod --namespace crossplane-system --all
 
-SA=$(kubectl -n crossplane-system get sa -o name | grep provider-kubernetes | sed -e 's|serviceaccount\/|crossplane-system:|g')
-kubectl create clusterrolebinding provider-kubernetes-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"
-
-SA=$(kubectl -n crossplane-system get sa -o name | grep provider-helm | sed -e 's|serviceaccount\/|crossplane-system:|g')
-kubectl create clusterrolebinding provider-helm-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"
+kubectl -n crossplane-system create sa kubernetes-helm
 
 cat << EOF | kubectl apply -f-
-apiVersion: helm.crossplane.io/v1beta1
-kind: ProviderConfig
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
 metadata:
-  name: helm-provider
+  name: provider-kubernetes
 spec:
-  credentials:
-    source: InjectedIdentity
+  package: xpkg.upbound.io/crossplane-contrib/provider-kubernetes:v0.11.4
+  runtimeConfigRef:
+    apiVersion: pkg.crossplane.io/v1beta1
+    kind: DeploymentRuntimeConfig
+    name: provider-kubernetes
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  name: provider-kubernetes
+spec:
+  serviceAccountTemplate:
+    metadata:
+      name: kubernetes-helm
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: provider-kubernetes-cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: kubernetes-helm
+    namespace: crossplane-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
 EOF
+
 cat << EOF | kubectl apply -f-
-apiVersion: kubernetes.crossplane.io/v1alpha1
-kind: ProviderConfig
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
 metadata:
-  name: kubernetes-provider
+  name: provider-helm
 spec:
-  credentials:
-    source: InjectedIdentity
+  package: xpkg.upbound.io/crossplane-contrib/provider-helm:v0.16.0
+  runtimeConfigRef:
+    apiVersion: pkg.crossplane.io/v1beta1
+    kind: DeploymentRuntimeConfig
+    name: provider-helm
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  name: provider-helm
+spec:
+  serviceAccountTemplate:
+    metadata:
+      name: kubernetes-helm
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: provider-helm-cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: kubernetes-helm
+    namespace: crossplane-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
 EOF

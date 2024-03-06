@@ -1,5 +1,6 @@
 local environments = import 'envs.jsonnet';
 local tanka = import 'github.com/grafana/jsonnet-libs/tanka-util/main.libsonnet';
+local argocd = import 'github.com/irizzante/argocd-apps-jsonnet/main.libsonnet';
 
 {
   environment(environment)::
@@ -10,7 +11,7 @@ local tanka = import 'github.com/grafana/jsonnet-libs/tanka-util/main.libsonnet'
     )
     + tanka.environment.withLabels({ environment: environment.name })
     + tanka.environment.withData(
-      (import 'argocd.libsonnet') +
+      argocd +
       environment.config + {
         _config+:: {
           appNameSuffix: environment.name,
