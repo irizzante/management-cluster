@@ -1,5 +1,6 @@
 local argoCd = import 'github.com/jsonnet-libs/argo-cd-libsonnet/2.5/main.libsonnet';
 local application = argoCd.argoproj.v1alpha1.application;
+local project = argoCd.argoproj.v1alpha1.appProject;
 
 {
 
@@ -174,7 +175,19 @@ local application = argoCd.argoproj.v1alpha1.application;
     },
 
     projects+: {
-
+      platform: {
+        destinations: [
+          {
+            namespace: '*',
+            server: 'https://kubernetes.default.svc',
+          },
+        ],
+        description: 'Platform applications',
+        sourceRepos: ['*'],
+        extras: project.spec.withClusterResourceWhitelist([
+          { group: '*', kind: '*' },
+        ]),
+      },
     },
 
   },
