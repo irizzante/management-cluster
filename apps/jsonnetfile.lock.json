@@ -8,7 +8,7 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "7e927b4fd5efeb1a0e6fe32d822c0824962afdea",
+      "version": "d92c7be85b3c37dcf4d5871fd83dcc102599c7c1",
       "sum": "0y3AFX9LQSpfWTxWKSwoLgbt0Wc9nnCwhMH2szKzHv0="
     },
     {
@@ -18,7 +18,7 @@
           "subdir": "tanka-util"
         }
       },
-      "version": "7e927b4fd5efeb1a0e6fe32d822c0824962afdea",
+      "version": "d92c7be85b3c37dcf4d5871fd83dcc102599c7c1",
       "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
     },
     {
@@ -28,8 +28,8 @@
           "subdir": ""
         }
       },
-      "version": "693b9fc831337ada7654c0dd4409158ba874d287",
-      "sum": "OEhkYNdhrsJhszMhQBueofVfu2yV3qpgoFAr5hEvo/c="
+      "version": "f6dfff823652e87aa98a6ee1c1c8f80c443690ef",
+      "sum": "87BYNVoltXkFey6Vphd1fY4NAxXLE6m5XHIYCoOC+rg="
     },
     {
       "source": {
@@ -40,6 +40,16 @@
       },
       "version": "9478cf16ac1e67b7a96fc362ddd268afa9c8e142",
       "sum": "/KFlJos2fHzwmoCFrMjmB0ZuWu+Rcbly7TKNC1UsW6c="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/jsonnet-libs/argo-cd-libsonnet.git",
+          "subdir": "2.9"
+        }
+      },
+      "version": "9478cf16ac1e67b7a96fc362ddd268afa9c8e142",
+      "sum": "VzJ1SsLNHpJ5qIhyDrh1YnO0QR6JeWy22yXvGJNcLro="
     },
     {
       "source": {

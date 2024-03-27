@@ -32,7 +32,7 @@
       "source": {
         "git": {
           "remote": "https://github.com/jsonnet-libs/argo-cd-libsonnet.git",
-          "subdir": "2.5"
+          "subdir": "2.9"
         }
       },
       "version": "main"

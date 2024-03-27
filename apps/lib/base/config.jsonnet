@@ -8,7 +8,7 @@ local project = argoCd.argoproj.v1alpha1.appProject;
 
     applications+: {
 
-      local helmAppTemplate = {
+      helmAppTemplate:: {
         enabled: true,
         annotations: {
         },
@@ -41,7 +41,7 @@ local project = argoCd.argoproj.v1alpha1.appProject;
         ],
       },
 
-      nginx: helmAppTemplate {
+      nginx: self.helmAppTemplate {
         annotations+: {
           'argocd.argoproj.io/sync-wave': '-10',
         },
@@ -61,7 +61,7 @@ local project = argoCd.argoproj.v1alpha1.appProject;
         ],
       },
 
-      prometheus: helmAppTemplate {
+      prometheus: self.helmAppTemplate {
         destination+: {
           namespace: 'prometheus',
         },
@@ -81,7 +81,7 @@ local project = argoCd.argoproj.v1alpha1.appProject;
         ],
       },
 
-      'external-secrets': helmAppTemplate {
+      'external-secrets': self.helmAppTemplate {
         annotations+: {
           'argocd.argoproj.io/sync-wave': '-10',
         },
@@ -132,7 +132,7 @@ local project = argoCd.argoproj.v1alpha1.appProject;
                 application.spec.source.withPath('apps/lib/base/cluster-store'),
       },
 
-      argocd: helmAppTemplate {
+      argocd: self.helmAppTemplate {
         annotations: {
           'argocd.argoproj.io/sync-wave': '-20',
         },
@@ -152,7 +152,7 @@ local project = argoCd.argoproj.v1alpha1.appProject;
         ],
       },
 
-      'metrics-server': helmAppTemplate {
+      'metrics-server': self.helmAppTemplate {
         annotations: {
           'argocd.argoproj.io/sync-wave': '-30',
         },

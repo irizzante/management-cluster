@@ -4,6 +4,7 @@ local application = argoCd.argoproj.v1alpha1.application;
 (import 'base/config.jsonnet') +
 (import 'variants/prod/config.jsonnet') +
 (import 'variants/local/config.jsonnet') +
+(import 'variants/crossplane/config.jsonnet') +
 {
 
   _config+:: {
