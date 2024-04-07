@@ -16,7 +16,7 @@ local application = argoCd.argoproj.v1alpha1.application;
         sources+: [
           (
             application.spec.source.withRepoURL('https://charts.crossplane.io/stable') +
-            application.spec.source.withTargetRevision('1.15.1') +
+            application.spec.source.withTargetRevision(self.targetRevision) +
             application.spec.source.withChart('crossplane') +
             application.spec.source.helm.withValueFiles(self.valueFiles)
           ).spec.source,
