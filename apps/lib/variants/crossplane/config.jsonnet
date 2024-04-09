@@ -1,28 +1,24 @@
-local argoCd = import 'github.com/jsonnet-libs/argo-cd-libsonnet/2.5/main.libsonnet';
+local argoCd = import 'github.com/jsonnet-libs/argo-cd-libsonnet/2.9/main.libsonnet';
 local application = argoCd.argoproj.v1alpha1.application;
+local utils = import 'utils.libsonnet';
 
 {
   _config+:: {
 
     applications+: {
 
-      crossplane: self.helmAppTemplate {
-        annotations+: {
+      crossplane:
+        utils.helmTemplate +
+        application.metadata.withAnnotations({
           'argocd.argoproj.io/sync-wave': '-5',
-        },
-        valueFiles+: [
-          '$values/apps/lib/variants/crossplane/values.yaml',
-        ],
-        sources+: [
-          (
-            application.spec.source.withRepoURL('https://charts.crossplane.io/stable') +
-            application.spec.source.withTargetRevision(self.targetRevision) +
-            application.spec.source.withChart('crossplane') +
-            application.spec.source.helm.withValueFiles(self.valueFiles)
-          ).spec.source,
-        ],
-
-      },
+        }) +
+        application.spec.withSourcesMixin(
+          application.spec.sources.withRepoURL('https://charts.crossplane.io/stable') +
+          application.spec.sources.withTargetRevision(self.crossplane.targetRevision) +
+          application.spec.sources.withChart('crossplane') +
+          application.spec.sources.helm.withValueFiles(self.crossplane.valueFiles)
+        ) +
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/variants/crossplane/values.yaml'),
 
     },
 

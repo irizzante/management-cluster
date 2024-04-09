@@ -1,6 +1,7 @@
-local argoCd = import 'github.com/jsonnet-libs/argo-cd-libsonnet/2.5/main.libsonnet';
+local argoCd = import 'github.com/jsonnet-libs/argo-cd-libsonnet/2.9/main.libsonnet';
 local application = argoCd.argoproj.v1alpha1.application;
 local project = argoCd.argoproj.v1alpha1.appProject;
+local utils = import 'utils.libsonnet';
 
 {
 
@@ -8,186 +9,88 @@ local project = argoCd.argoproj.v1alpha1.appProject;
 
     applications+: {
 
-      helmAppTemplate:: {
-        enabled: true,
-        annotations: {
-        },
-        finalizers: [
-          'resources-finalizer.argocd.argoproj.io',
-        ],
-        project: 'platform',
-        destination: {
-          namespace: '',
-        },
-        syncPolicy: {
-          allowEmpty: true,
-          selfHeal: true,
-          prune: true,
-        },
-        syncOptions: [
-          'CreateNamespace=true',
-          'PruneLast=true',
-        ],
-        valuesRepo: {
-          repoURL: 'https://github.com/irizzante/management-cluster.git',
-          ref: 'values',
-          targetRevision: 'main',
-        },
-        valueFiles: [
-        ],
-        targetRevision: '',
-        sources: [
-          self.valuesRepo,
-        ],
-      },
-
-      nginx: self.helmAppTemplate {
-        annotations+: {
+      nginx:
+        utils.helmTemplate +
+        application.metadata.withAnnotations({
           'argocd.argoproj.io/sync-wave': '-10',
-        },
-        destination+: {
-          namespace: 'nginx',
-        },
-        valueFiles+: [
-          '$values/apps/lib/base/nginx/values.yaml',
-        ],
-        sources+: [
-          (
-            application.spec.source.withRepoURL('https://kubernetes.github.io/ingress-nginx') +
-            application.spec.source.withTargetRevision(self.targetRevision) +
-            application.spec.source.withChart('ingress-nginx') +
-            application.spec.source.helm.withValueFiles(self.valueFiles)
-          ).spec.source,
-        ],
-      },
+        }) +
+        application.spec.destination.withNamespace('nginx') +
+        application.spec.withSourcesMixin(
+          application.spec.sources.withRepoURL('https://kubernetes.github.io/ingress-nginx') +
+          application.spec.sources.withChart('ingress-nginx') +
+          application.spec.sources.withTargetRevision(self.nginx.targetRevision) +
+          application.spec.sources.helm.withValueFilesMixin(self.nginx.valueFiles)
+        ) +
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/nginx/values.yaml'),
 
-      prometheus: self.helmAppTemplate {
-        destination+: {
-          namespace: 'prometheus',
-        },
-        syncOptions+: [
-          'ServerSideApply=true',
-        ],
-        valueFiles+: [
-          '$values/apps/lib/base/prometheus/values.yaml',
-        ],
-        sources+: [
-          (
-            application.spec.source.withRepoURL('https://prometheus-community.github.io/helm-charts') +
-            application.spec.source.withTargetRevision(self.targetRevision) +
-            application.spec.source.withChart('kube-prometheus-stack') +
-            application.spec.source.helm.withValueFiles(self.valueFiles)
-          ).spec.source,
-        ],
-      },
+      prometheus:
+        utils.helmTemplate +
+        application.spec.destination.withNamespace('prometheus') +
+        application.spec.syncPolicy.withSyncOptionsMixin('ServerSideApply=true') +
+        application.spec.withSourcesMixin(
+          application.spec.sources.withRepoURL('https://prometheus-community.github.io/helm-charts') +
+          application.spec.sources.withChart('kube-prometheus-stack') +
+          application.spec.sources.withTargetRevision(self.prometheus.targetRevision) +
+          application.spec.sources.helm.withValueFilesMixin(self.prometheus.valueFiles)
+        ) +
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/prometheus/values.yaml'),
 
-      'external-secrets': self.helmAppTemplate {
-        annotations+: {
+      'external-secrets':
+        utils.helmTemplate +
+        application.metadata.withAnnotationsMixin({
           'argocd.argoproj.io/sync-wave': '-10',
-        },
-        destination+: {
-          namespace: 'external-secrets',
-        },
-        valuesRepo+: {
-          repoURL: 'https://github.com/irizzante/management-cluster.git',
-          ref: 'values',
-          targetRevision: 'main',
-        },
-        valueFiles+: [
-          '$values/apps/lib/base/external-secrets/values.yaml',
-        ],
-        sources+: [
-          (
-            application.spec.source.withRepoURL('https://charts.external-secrets.io') +
-            application.spec.source.withTargetRevision(self.targetRevision) +
-            application.spec.source.withChart('external-secrets') +
-            application.spec.source.helm.withValueFiles(self.valueFiles)
-          ).spec.source,
-        ],
-      },
+        }) +
+        application.spec.destination.withNamespace('external-secrets') +
+        application.spec.withSourcesMixin(
+          application.spec.sources.withRepoURL('https://charts.external-secrets.io') +
+          application.spec.sources.withChart('external-secrets') +
+          application.spec.sources.withTargetRevision(self['external-secrets'].targetRevision) +
+          application.spec.sources.helm.withValueFilesMixin(self['external-secrets'].valueFiles)
+        ) +
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/external-secrets/values.yaml'),
 
-      'cluster-store': {
-        enabled: true,
-        annotations: {
-        },
-        finalizers: [
-          'resources-finalizer.argocd.argoproj.io',
-        ],
-        project: 'platform',
-        destination: {
-          namespace: 'external-secrets',
-        },
-        syncPolicy: {
-          allowEmpty: true,
-          selfHeal: true,
-          prune: true,
-        },
-        syncOptions: [
-          'CreateNamespace=true',
-          'PruneLast=true',
-        ],
-        targetRevision: 'HEAD',
-        source: application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
-                application.spec.source.withTargetRevision(self.targetRevision) +
-                application.spec.source.withPath('apps/lib/base/cluster-store'),
-      },
-
-      argocd: self.helmAppTemplate {
-        annotations: {
+      argocd:
+        utils.helmTemplate +
+        utils.helmTemplate.withTargetRevision(importstr 'envs/management-local/argocd/version.txt') +
+        application.metadata.withAnnotationsMixin({
           'argocd.argoproj.io/sync-wave': '-20',
-        },
-        destination: {
-          namespace: 'argocd',
-        },
-        valueFiles+: [
-          '$values/apps/lib/base/argocd/values.yaml',
-        ],
-        sources+: [
-          (
-            application.spec.source.withRepoURL('https://argoproj.github.io/argo-helm') +
-            application.spec.source.withTargetRevision(self.targetRevision) +
-            application.spec.source.withChart('argo-cd') +
-            application.spec.source.helm.withValueFiles(self.valueFiles)
-          ).spec.source,
-        ],
-      },
+        }) +
+        application.spec.destination.withNamespace('argocd') +
+        application.spec.withSourcesMixin(
+          application.spec.sources.withRepoURL('https://argoproj.github.io/argo-helm') +
+          application.spec.sources.withChart('argo-cd') +
+          application.spec.sources.withTargetRevision(self.argocd.targetRevision) +
+          application.spec.sources.helm.withValueFilesMixin(self.argocd.valueFiles)
+        ) +
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/argocd/values.yaml'),
 
-      'metrics-server': self.helmAppTemplate {
-        annotations: {
+      'metrics-server':
+        utils.helmTemplate +
+        application.metadata.withAnnotationsMixin({
           'argocd.argoproj.io/sync-wave': '-30',
-        },
-        destination: {
-          namespace: 'kube-system',
-        },
-        valueFiles+: [
-          '$values/apps/lib/base/metrics-server/values.yaml',
-        ],
-        sources+: [
-          (
-            application.spec.source.withRepoURL('https://kubernetes-sigs.github.io/metrics-server') +
-            application.spec.source.withTargetRevision(self.targetRevision) +
-            application.spec.source.withChart('metrics-server') +
-            application.spec.source.helm.withValueFiles(self.valueFiles)
-          ).spec.source,
-        ],
-      },
+        }) +
+        application.spec.destination.withNamespace('kube-system') +
+        application.spec.withSourcesMixin(
+          application.spec.sources.withRepoURL('https://kubernetes-sigs.github.io/metrics-server') +
+          application.spec.sources.withChart('metrics-server') +
+          application.spec.sources.withTargetRevision(self['metrics-server'].targetRevision) +
+          application.spec.sources.helm.withValueFilesMixin(self['metrics-server'].valueFiles)
+        ) +
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/metrics-server/values.yaml'),
 
     },
 
     projects+: {
-      platform: {
-        destinations: [
-          {
-            namespace: '*',
-            server: 'https://kubernetes.default.svc',
-          },
-        ],
-        description: 'Platform applications',
-        sourceRepos: ['*'],
-        extras: project.spec.withClusterResourceWhitelist([
+      platform:
+        project.spec.withDescription('Platform applications') +
+        project.spec.withSourceRepos('*') +
+        project.spec.withDestinations(
+          project.spec.destinations.withNamespace('*') +
+          project.spec.destinations.withServer('https://kubernetes.default.svc')
+        ) +
+        project.spec.withClusterResourceWhitelist([
           { group: '*', kind: '*' },
         ]),
-      },
     },
 
   },

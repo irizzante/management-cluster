@@ -1,6 +1,6 @@
 local environments = import 'envs.jsonnet';
 local tanka = import 'github.com/grafana/jsonnet-libs/tanka-util/main.libsonnet';
-local argocdApps = import 'github.com/irizzante/argocd-apps-jsonnet/main.libsonnet';
+local argocdApps = import 'main.libsonnet';
 
 {
   environment(environment)::
