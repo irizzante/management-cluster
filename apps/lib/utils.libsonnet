@@ -24,11 +24,11 @@ local application = argoCd.argoproj.v1alpha1.application;
       withValueFilesMixin:: function(valueFiles) { valueFiles+:: if std.isArray(valueFiles) then valueFiles else [valueFiles] },
       withTargetRevision:: function(targetRevision) { targetRevision:: targetRevision },
       withEnabled:: function(enabled) { enabled:: enabled },
-      withSourcesMixin:: function(repoURL, chart) application.spec.withSourcesMixin(
+      withSourcesMixin:: function(repoURL, chart, targetRevision, valueFiles) application.spec.withSourcesMixin(
         application.spec.sources.withRepoURL(repoURL) +
         application.spec.sources.withChart(chart) +
-        application.spec.sources.withTargetRevision(self.targetRevision) +
-        application.spec.sources.helm.withValueFilesMixin(self.valueFiles)
+        application.spec.sources.withTargetRevision(targetRevision) +
+        application.spec.sources.helm.withValueFilesMixin(valueFiles)
       ),
       enabled:: true,
       targetRevision:: '',

@@ -5,7 +5,7 @@ local application = argoCd.argoproj.v1alpha1.application;
 (import 'variants/prod/config.jsonnet') +
 (import 'variants/local/config.jsonnet') +
 (import 'variants/crossplane/config.jsonnet') +
-(import 'variants/externalsecrets-bitwarden-cluster-secret-store/config.jsonnet') +
+(import 'variants/externalsecrets-bitwarden/config.jsonnet') +
 {
 
   _config+:: {

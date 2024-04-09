@@ -13,7 +13,7 @@ local utils = import 'utils.libsonnet';
         application.spec.destination.withNamespace('external-secrets') +
         application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
         application.spec.source.withTargetRevision(self['cluster-secret-store'].targetRevision) +
-        application.spec.source.withPath('apps/lib/variants/externalsecrets-bitwarden-cluster-secret-store/cluster-secret-store'),
+        application.spec.source.withPath('apps/lib/variants/externalsecrets-bitwarden/cluster-secret-store'),
 
     },
 
