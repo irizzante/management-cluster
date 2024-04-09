@@ -48,12 +48,4 @@ local application = argoCd.argoproj.v1alpha1.application;
       application.spec.sources.withRef('values'),
     ]),
 
-  sources(repoURL, chart, targetRevision, valueFiles)::
-    (
-      application.spec.source.withRepoURL(repoURL) +
-      application.spec.source.withTargetRevision(targetRevision) +
-      application.spec.source.withChart('kube-prometheus-stack') +
-      application.spec.source.helm.withValueFiles(valueFiles)
-    ).spec.source,
-
 }
