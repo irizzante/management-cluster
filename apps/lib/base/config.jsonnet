@@ -23,12 +23,7 @@ local utils = import 'utils.libsonnet';
         utils.helmTemplate +
         application.spec.destination.withNamespace('prometheus') +
         application.spec.syncPolicy.withSyncOptionsMixin('ServerSideApply=true') +
-        application.spec.withSourcesMixin(
-          application.spec.sources.withRepoURL('https://prometheus-community.github.io/helm-charts') +
-          application.spec.sources.withChart('kube-prometheus-stack') +
-          application.spec.sources.withTargetRevision(self.prometheus.targetRevision) +
-          application.spec.sources.helm.withValueFilesMixin(self.prometheus.valueFiles)
-        ) +
+        utils.helmTemplate.withSourcesMixin('https://prometheus-community.github.io/helm-charts', 'kube-prometheus-stack', self.prometheus.targetRevision, self.prometheus.valueFiles) +
         utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/prometheus/values.yaml'),
 
       'external-secrets':
@@ -37,12 +32,7 @@ local utils = import 'utils.libsonnet';
           'argocd.argoproj.io/sync-wave': '-10',
         }) +
         application.spec.destination.withNamespace('external-secrets') +
-        application.spec.withSourcesMixin(
-          application.spec.sources.withRepoURL('https://charts.external-secrets.io') +
-          application.spec.sources.withChart('external-secrets') +
-          application.spec.sources.withTargetRevision(self['external-secrets'].targetRevision) +
-          application.spec.sources.helm.withValueFilesMixin(self['external-secrets'].valueFiles)
-        ) +
+        utils.helmTemplate.withSourcesMixin('https://charts.external-secrets.io', 'external-secrets', self['external-secrets'].targetRevision, self['external-secrets'].valueFiles) +
         utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/external-secrets/values.yaml'),
 
       argocd:
@@ -52,12 +42,7 @@ local utils = import 'utils.libsonnet';
           'argocd.argoproj.io/sync-wave': '-20',
         }) +
         application.spec.destination.withNamespace('argocd') +
-        application.spec.withSourcesMixin(
-          application.spec.sources.withRepoURL('https://argoproj.github.io/argo-helm') +
-          application.spec.sources.withChart('argo-cd') +
-          application.spec.sources.withTargetRevision(self.argocd.targetRevision) +
-          application.spec.sources.helm.withValueFilesMixin(self.argocd.valueFiles)
-        ) +
+        utils.helmTemplate.withSourcesMixin('https://argoproj.github.io/argo-helm', 'argo-cd', self.argocd.targetRevision, self.argocd.valueFiles) +
         utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/argocd/values.yaml'),
 
       'metrics-server':
@@ -66,12 +51,7 @@ local utils = import 'utils.libsonnet';
           'argocd.argoproj.io/sync-wave': '-30',
         }) +
         application.spec.destination.withNamespace('kube-system') +
-        application.spec.withSourcesMixin(
-          application.spec.sources.withRepoURL('https://kubernetes-sigs.github.io/metrics-server') +
-          application.spec.sources.withChart('metrics-server') +
-          application.spec.sources.withTargetRevision(self['metrics-server'].targetRevision) +
-          application.spec.sources.helm.withValueFilesMixin(self['metrics-server'].valueFiles)
-        ) +
+        utils.helmTemplate.withSourcesMixin('https://kubernetes-sigs.github.io/metrics-server', 'metrics-server', self['metrics-server'].targetRevision, self['metrics-server'].valueFiles) +
         utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/metrics-server/values.yaml'),
 
       'app-of-apps':
