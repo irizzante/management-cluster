@@ -5,24 +5,55 @@ if kind get clusters -q | grep crossplane; then
   exit 0
 fi
 
-# shellcheck source=/dev/null
-source credentials
+cd "$(dirname "$0")" || exit
 
-cat <<EOF | kind create cluster --name crossplane --config=-
+cd ..
+
+workspaceDir="$PWD"
+
+cd - > /dev/null || exit
+
+# shellcheck source=/dev/null
+source "$workspaceDir/credentials"
+
+cat <<EOF | kind create cluster --name management --config=-
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 networking:
   podSubnet: "10.95.0.0/16"
-  serviceSubnet: "10.96.0.0/12"
-  disableDefaultCNI: true
+  serviceSubnet: "10.96.0.0/16"
+  disableDefaultCNI: true   # do not install kindnet
+  kubeProxyMode: none       # do not run kube-proxy
 nodes:
 - role: control-plane
   kubeadmConfigPatches:
-    - |
-      kind: InitConfiguration
-      nodeRegistration:
-        kubeletExtraArgs:
-          node-labels: "ingress-ready=true"
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  - |
+    kind: ClusterConfiguration
+    controllerManager:
+      extraArgs:
+        bind-address: 0.0.0.0
+        #secure-port: "0"
+        #port: "10257"
+    etcd:
+      local:
+        extraArgs:
+          listen-metrics-urls: http://0.0.0.0:2381
+    scheduler:
+      extraArgs:
+        bind-address: 0.0.0.0
+        #secure-port: "0"
+        #port: "10259"
+  - |
+    kind: KubeProxyConfiguration
+    metricsBindAddress: 0.0.0.0
+  extraMounts:
+  - containerPath: /var/lib/kubelet/config.json
+    hostPath: "$HOME/.docker/config.json"
   extraPortMappings:
     - containerPort: 443
       hostPort: 443
@@ -31,40 +62,48 @@ nodes:
 - role: worker
 - role: worker
 - role: worker
+
 EOF
 
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/tigera-operator.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v0.7.0/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v0.7.0/config/crd/standard/gateway.networking.k8s.io_gateways.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v0.7.0/config/crd/standard/gateway.networking.k8s.io_httproutes.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v0.7.0/config/crd/standard/gateway.networking.k8s.io_referencegrants.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v0.7.0/config/crd/experimental/gateway.networking.k8s.io_tlsroutes.yaml
 
-cat << EOF | kubectl create -f-
-# This section includes base Calico installation configuration.
-# For more information, see: https://projectcalico.docs.tigera.io/master/reference/installation/api#operator.tigera.io/v1.Installation
-apiVersion: operator.tigera.io/v1
-kind: Installation
-metadata:
-  name: default
-spec:
-  # Configures Calico networking.
-  calicoNetwork:
-    # Note: The ipPools section cannot be modified post-install.
-    ipPools:
-    - blockSize: 26
-      cidr: 10.95.0.0/16
-      encapsulation: VXLANCrossSubnet
-      natOutgoing: Enabled
-      nodeSelector: all()
-
----
-
-# This section configures the Calico API server.
-# For more information, see: https://projectcalico.docs.tigera.io/master/reference/installation/api#operator.tigera.io/v1.APIServer
-apiVersion: operator.tigera.io/v1
-kind: APIServer 
-metadata: 
-  name: default 
-spec: {}
+helm upgrade --install --namespace kube-system --repo https://helm.cilium.io cilium cilium --values - <<EOF
+kubeProxyReplacement: strict
+k8sServiceHost: management-control-plane # use master node in kind network
+k8sServicePort: 6443               # use api server port
+hostServices:
+  enabled: false
+externalIPs:
+  enabled: true
+nodePort:
+  enabled: true
+hostPort:
+  enabled: true
+image:
+  pullPolicy: IfNotPresent
+ipam:
+  mode: kubernetes
+hubble:
+  enabled: true
+  relay:
+    enabled: true
+  ui:
+    enabled: true
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+      hosts:
+        - hubble-ui.localtest.me
+gatewayAPI:
+ enabled: true
 EOF
 
-kubectl wait --for condition=ready pod --namespace kube-system --all
+kubectl wait --for condition=ready pod --namespace kube-system --all --timeout 300s
 
 
 kubectl -n crossplane-system create sa kubernetes-helm
@@ -85,4 +124,4 @@ metadata:
 type: Opaque
 EOF
 
-helm upgrade --install argocd-management-local -n argocd --create-namespace -f ../apps/lib/base/argocd/values.yaml argo/argo-cd --wait
+helm upgrade --install argocd-management-local -n argocd --create-namespace -f "$workspaceDir/apps/lib/base/argocd/values.yaml" -f "$workspaceDir/apps/lib/variants/prod/argocd/values-prod.yaml" -f "$workspaceDir/apps/lib/variants/prod/argocd/values-replicas.yaml" -f "$workspaceDir/apps/lib/envs/management-local/argocd/values-replicas.yaml argo/argo-cd" --wait
