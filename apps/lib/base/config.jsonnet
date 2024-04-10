@@ -16,7 +16,7 @@ local utils = import 'utils.libsonnet';
         }) +
         application.spec.destination.withNamespace('nginx') +
         utils.helmTemplate.withSourcesMixin('https://kubernetes.github.io/ingress-nginx', 'ingress-nginx', self.nginx.targetRevision, self.nginx.valueFiles) +
-        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/nginx/values.yaml') + 
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/nginx/values.yaml') +
         utils.helmTemplate.withTargetRevision(importstr 'base/nginx/version.txt'),
 
       prometheus:
@@ -73,6 +73,17 @@ local utils = import 'utils.libsonnet';
           application.spec.sources.helm.withValueFilesMixin(self['metrics-server'].valueFiles)
         ) +
         utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/metrics-server/values.yaml'),
+
+      'app-of-apps':
+        utils.appTemplate +
+        utils.appTemplate.withEnabled(true) +
+        application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
+        application.spec.source.withTargetRevision('HEAD') +
+        application.spec.source.withPath('apps') +
+        application.spec.source.plugin.withEnv([
+          { name: 'TK_ENV', value: 'default' },
+          { name: 'TK_EXTRA_ARGS', value: '' },
+        ]),
 
     },
 
