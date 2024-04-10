@@ -66,91 +66,8 @@ EOF
 
 kubectl wait --for condition=ready pod --namespace kube-system --all
 
-helm repo add crossplane-stable https://charts.crossplane.io/stable
-helm repo update
-helm install crossplane \
---namespace crossplane-system \
---create-namespace \
-crossplane-stable/crossplane \
---wait
-
-kubectl wait --for condition=ready pod --namespace crossplane-system --all
-
-sleep 10
-
-kubectl wait --for condition=ready pod --namespace crossplane-system --all
 
 kubectl -n crossplane-system create sa kubernetes-helm
-
-cat << EOF | kubectl apply -f-
-apiVersion: pkg.crossplane.io/v1
-kind: Provider
-metadata:
-  name: provider-kubernetes
-spec:
-  package: xpkg.upbound.io/crossplane-contrib/provider-kubernetes:v0.11.4
-  runtimeConfigRef:
-    apiVersion: pkg.crossplane.io/v1beta1
-    kind: DeploymentRuntimeConfig
-    name: provider-kubernetes
----
-apiVersion: pkg.crossplane.io/v1beta1
-kind: DeploymentRuntimeConfig
-metadata:
-  name: provider-kubernetes
-spec:
-  serviceAccountTemplate:
-    metadata:
-      name: kubernetes-helm
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: provider-kubernetes-cluster-admin
-subjects:
-  - kind: ServiceAccount
-    name: kubernetes-helm
-    namespace: crossplane-system
-roleRef:
-  kind: ClusterRole
-  name: cluster-admin
-  apiGroup: rbac.authorization.k8s.io
-EOF
-
-cat << EOF | kubectl apply -f-
-apiVersion: pkg.crossplane.io/v1
-kind: Provider
-metadata:
-  name: provider-helm
-spec:
-  package: xpkg.upbound.io/crossplane-contrib/provider-helm:v0.16.0
-  runtimeConfigRef:
-    apiVersion: pkg.crossplane.io/v1beta1
-    kind: DeploymentRuntimeConfig
-    name: provider-helm
----
-apiVersion: pkg.crossplane.io/v1beta1
-kind: DeploymentRuntimeConfig
-metadata:
-  name: provider-helm
-spec:
-  serviceAccountTemplate:
-    metadata:
-      name: kubernetes-helm
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: provider-helm-cluster-admin
-subjects:
-  - kind: ServiceAccount
-    name: kubernetes-helm
-    namespace: crossplane-system
-roleRef:
-  kind: ClusterRole
-  name: cluster-admin
-  apiGroup: rbac.authorization.k8s.io
-EOF
 
 kubectl create ns bitwarden
 
@@ -167,3 +84,5 @@ metadata:
   namespace: bitwarden
 type: Opaque
 EOF
+
+helm upgrade --install argocd-management-local -n argocd --create-namespace -f ../apps/lib/base/argocd/values.yaml argo/argo-cd --wait
