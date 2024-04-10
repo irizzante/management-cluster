@@ -12,6 +12,7 @@ local utils = import 'utils.libsonnet';
         application.metadata.withAnnotations({
           'argocd.argoproj.io/sync-wave': '-5',
         }) +
+        application.spec.destination.withNamespace('crossplane') +
         application.spec.withSourcesMixin(
           application.spec.sources.withRepoURL('https://charts.crossplane.io/stable') +
           application.spec.sources.withTargetRevision(self.crossplane.targetRevision) +
