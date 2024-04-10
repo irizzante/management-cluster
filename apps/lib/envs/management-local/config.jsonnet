@@ -33,7 +33,6 @@ local application = argoCd.argoproj.v1alpha1.application;
       argocd+: {
         targetRevision: (importstr 'envs/management-local/argocd/version.txt'),
         valueFiles+: [
-          '$values/apps/lib/envs/management-local/argocd/values.yaml',
           '$values/apps/lib/envs/management-local/argocd/values-replicas.yaml',
         ],
       },
