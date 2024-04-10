@@ -3,7 +3,6 @@ server:
     enabled: true
     annotations:
       nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     hostname: argocd.localtest.me
     ingressClassName: nginx
 
@@ -191,8 +190,3 @@ configs:
             end
           end
           return hs
-
-# https://github.com/prometheus-community/helm-charts/issues/2516
-prometheusOperator:
-  admissionWebhooks:
-    failurePolicy: IgnoreOnInstallOnly
