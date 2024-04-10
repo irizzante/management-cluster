@@ -191,3 +191,7 @@ configs:
             end
           end
           return hs
+
+prometheusOperator:
+  admissionWebhooks:
+    failurePolicy: IgnoreOnInstallOnly
