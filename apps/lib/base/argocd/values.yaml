@@ -191,6 +191,7 @@ configs:
           end
           return hs
 
+# https://github.com/prometheus-community/helm-charts/issues/2516
 prometheusOperator:
   admissionWebhooks:
     failurePolicy: IgnoreOnInstallOnly
