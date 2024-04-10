@@ -16,7 +16,8 @@ local utils = import 'utils.libsonnet';
         }) +
         application.spec.destination.withNamespace('nginx') +
         utils.helmTemplate.withSourcesMixin('https://kubernetes.github.io/ingress-nginx', 'ingress-nginx', self.nginx.targetRevision, self.nginx.valueFiles) +
-        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/nginx/values.yaml'),
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/nginx/values.yaml') + 
+        utils.helmTemplate.withTargetRevision(importstr 'base/nginx/version.txt'),
 
       prometheus:
         utils.helmTemplate +
