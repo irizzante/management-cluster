@@ -68,6 +68,12 @@ local utils = import 'utils.libsonnet';
         ],
       },
 
+      thanos+: {
+        valueFiles+: [
+          '$values/apps/lib/envs/management-local/thanos/values.yaml',
+        ],
+      },
+
     },
 
   },

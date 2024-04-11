@@ -1,0 +1,4 @@
+query:
+  dnsDiscovery:
+    sidecarsService: "prometheus-management-loca-thanos-discovery"
+    sidecarsNamespace: "prometheus"
