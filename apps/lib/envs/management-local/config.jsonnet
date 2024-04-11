@@ -59,6 +59,12 @@ local utils = import 'utils.libsonnet';
         targetRevision: (importstr 'envs/management-local/crossplane/version.txt'),
       },
 
+      minio+: {
+        valueFiles+: [
+          '$values/apps/lib/envs/management-local/minio/values.yaml',
+        ],
+      },
+
     },
 
   },
