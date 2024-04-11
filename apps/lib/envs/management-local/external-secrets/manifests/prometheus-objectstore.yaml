@@ -2,7 +2,7 @@ apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
   name: thanos-objectstore
-  namespace: thanos
+  namespace: prometheus
 spec:
   target:
     name: thanos-objectstore

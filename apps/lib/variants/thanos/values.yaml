@@ -1,1 +1,17 @@
 existingObjstoreSecret: thanos-objectstore
+
+query:
+  dnsDiscovery:
+    sidecarsService: "prometheus-operated"
+    sidecarsNamespace: "prometheus"
+
+compactor:
+  enabled: true
+
+storegateway:
+  enabled: true
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
