@@ -8,6 +8,7 @@ local utils = import 'utils.libsonnet';
 (import 'variants/crossplane/config.jsonnet') +
 (import 'variants/externalsecrets-bitwarden/config.jsonnet') +
 (import 'variants/minio/config.jsonnet') +
+(import 'variants/thanos/config.jsonnet') +
 {
 
   _config+:: {
