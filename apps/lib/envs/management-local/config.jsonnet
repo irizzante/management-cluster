@@ -1,5 +1,6 @@
 local argoCd = import 'github.com/jsonnet-libs/argo-cd-libsonnet/2.9/main.libsonnet';
 local application = argoCd.argoproj.v1alpha1.application;
+local utils = import 'utils.libsonnet';
 
 (import 'base/config.jsonnet') +
 (import 'variants/prod/config.jsonnet') +
@@ -23,12 +24,20 @@ local application = argoCd.argoproj.v1alpha1.application;
         targetRevision: (importstr 'envs/management-local/prometheus/version.txt'),
         valueFiles+: [
           '$values/apps/lib/envs/management-local/prometheus/values-replicas.yaml',
+          '$values/apps/lib/envs/management-local/prometheus/values.yaml',
         ],
       },
 
       'external-secrets'+: {
         targetRevision: (importstr 'envs/management-local/external-secrets/version.txt'),
       },
+
+      'prometheus-manifests':
+        utils.appTemplate +
+        utils.appTemplate.withEnabled(true) +
+        application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
+        application.spec.source.withTargetRevision('HEAD') +
+        application.spec.source.withPath('apps/lib/envs/management-local/prometheus/manifests'),
 
       argocd+: {
         targetRevision: (importstr 'envs/management-local/argocd/version.txt'),
