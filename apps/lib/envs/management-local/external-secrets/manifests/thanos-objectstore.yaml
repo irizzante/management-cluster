@@ -1,11 +1,11 @@
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
-  name: minio-secret
-  namespace: minio
+  name: thanos-objectstore
+  namespace: thanos
 spec:
   target:
-    name: minio-secret
+    name: thanos-objectstore
     deletionPolicy: Delete
     template:
       type: Opaque
