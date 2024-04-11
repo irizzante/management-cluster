@@ -3,7 +3,6 @@ server:
     enabled: true
     annotations:
       nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-    hostname: argocd.localtest.me
     ingressClassName: nginx
 
 controller:

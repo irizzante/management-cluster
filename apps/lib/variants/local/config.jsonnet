@@ -16,6 +16,18 @@
         ],
       },
 
+      argocd+: {
+        valueFiles+: [
+          '$values/apps/lib/variants/local/argocd/values-local.yaml',
+        ],
+      },
+
+      prometheus+: {
+        valueFiles+: [
+          '$values/apps/lib/variants/local/prometheus/values-local.yaml',
+        ],
+      },
+
     },
 
   },
