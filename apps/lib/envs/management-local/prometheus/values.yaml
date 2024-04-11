@@ -8,8 +8,9 @@ prometheus:
   prometheusSpec:
     thanos:
       objectStorageConfig:
-        name: thanos-objectstore
-        key: objstore.yml
+        existingSecret:
+          name: thanos-objectstore
+          key: objstore.yml
   thanosService:
     enabled: true
   thanosServiceMonitor:
