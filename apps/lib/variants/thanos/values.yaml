@@ -1,6 +1,7 @@
 existingObjstoreSecret: thanos-objectstore
 
 query:
+  replicaLabel: ["replica","prometheus_replica"]
   dnsDiscovery:
     sidecarsService: "prometheus-operated"
     sidecarsNamespace: "prometheus"
