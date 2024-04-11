@@ -1,2 +1,5 @@
 ingress:
   hostname: minio.localtest.me
+auth:
+  existingSecret: minio-secret
+  forceNewKeys: true

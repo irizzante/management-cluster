@@ -33,13 +33,12 @@ local utils = import 'utils.libsonnet';
         targetRevision: (importstr 'envs/management-local/external-secrets/version.txt'),
       },
 
-      'prometheus-manifests':
+      'external-secrets-manifests':
         utils.appTemplate +
         utils.appTemplate.withEnabled(true) +
-        application.spec.destination.withNamespace('prometheus') +
         application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
         application.spec.source.withTargetRevision('HEAD') +
-        application.spec.source.withPath('apps/lib/envs/management-local/prometheus/manifests'),
+        application.spec.source.withPath('apps/lib/envs/management-local/external-secrets/manifests'),
 
       argocd+: {
         targetRevision: (importstr 'envs/management-local/argocd/version.txt'),
