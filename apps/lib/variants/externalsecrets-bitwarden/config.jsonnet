@@ -9,6 +9,9 @@ local utils = import 'utils.libsonnet';
 
       'cluster-secret-store':
         utils.appTemplate +
+        application.metadata.withAnnotationsMixin({
+          'argocd.argoproj.io/sync-wave': '-10',
+        }) +
         utils.appTemplate.withEnabled(true) +
         application.spec.destination.withNamespace('external-secrets') +
         application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
