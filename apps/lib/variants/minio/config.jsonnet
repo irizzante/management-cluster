@@ -15,7 +15,7 @@ local utils = import 'utils.libsonnet';
         application.spec.destination.withNamespace('minio') +
         utils.helmTemplate.withSourcesMixin('https://charts.bitnami.com/bitnami', 'minio', self.minio.targetRevision, self.minio.valueFiles) +
         utils.helmTemplate.withTargetRevision((importstr 'version.txt')) +
-        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/variants/minio/config.jsonnet'),
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/variants/minio/values.yaml'),
 
     },
 
