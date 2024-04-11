@@ -124,4 +124,6 @@ metadata:
 type: Opaque
 EOF
 
-helm upgrade --install argocd-management-local -n argocd --create-namespace -f "$workspaceDir/apps/lib/base/argocd/values.yaml" -f "$workspaceDir/apps/lib/variants/prod/argocd/values-prod.yaml" -f "$workspaceDir/apps/lib/variants/prod/argocd/values-replicas.yaml" -f "$workspaceDir/apps/lib/envs/management-local/argocd/values-replicas.yaml argo/argo-cd" --wait
+helm upgrade --install argocd-management-local -n argocd --create-namespace \
+-f "$workspaceDir/apps/lib/base/argocd/values.yaml" \
+argo/argo-cd --wait
