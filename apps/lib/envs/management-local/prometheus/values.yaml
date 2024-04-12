@@ -6,6 +6,7 @@ grafana:
   sidecar:
     datasources:
       defaultDatasourceEnabled: false
+      isDefaultDatasource: false
   additionalDataSources:
     - name: prometheus
       type: prometheus
