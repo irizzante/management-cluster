@@ -3,13 +3,11 @@ query:
     sidecarsService: "prometheus-management-loca-thanos-discovery"
     sidecarsNamespace: "prometheus"
   replicaCount: 3
-  podAntiAffinityPreset: hard
   pdb:
     create: true
 
 queryFrontend:
   replicaCount: 2
-  podAntiAffinityPreset: hard
   pdb:
     create: true
   ingress:
@@ -19,7 +17,6 @@ queryFrontend:
 
 storegateway:
   replicaCount: 2
-  podAntiAffinityPreset: hard
   pdb:
     create: true
   sharded:
