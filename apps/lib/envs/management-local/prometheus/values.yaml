@@ -3,6 +3,16 @@ grafana:
     existingSecret: "grafana-admin"
     userKey: admin-user
     passwordKey: admin-password
+  sidecar:
+    datasources:
+      defaultDatasourceEnabled: false
+  additionalDataSources:
+    - name: prometheus
+      type: prometheus
+      url: http://minio-management-local.minio.svc.cluster.local:9090
+      access: proxy
+      isDefault: true
+      editable: true
 
 prometheus:
   prometheusSpec:
