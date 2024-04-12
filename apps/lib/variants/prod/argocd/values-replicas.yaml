@@ -12,4 +12,4 @@ repoServer:
     minReplicas: 2
 
 applicationSet:
-  replicaCount: 3
+  replicas: 2
