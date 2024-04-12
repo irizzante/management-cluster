@@ -2,12 +2,10 @@ query:
   dnsDiscovery:
     sidecarsService: "prometheus-management-loca-thanos-discovery"
     sidecarsNamespace: "prometheus"
-  replicaCount: 3
   pdb:
     create: true
 
 queryFrontend:
-  replicaCount: 2
   pdb:
     create: true
   ingress:
@@ -16,7 +14,6 @@ queryFrontend:
     ingressClassName: nginx
 
 storegateway:
-  replicaCount: 2
   pdb:
     create: true
   sharded:
