@@ -3,6 +3,8 @@ kind: ExternalSecret
 metadata:
   name: thanos-objectstore
   namespace: prometheus
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10"
 spec:
   target:
     name: thanos-objectstore

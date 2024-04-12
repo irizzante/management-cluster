@@ -36,9 +36,6 @@ local utils = import 'utils.libsonnet';
 
       'external-secrets-manifests':
         utils.appTemplate +
-        application.metadata.withAnnotationsMixin({
-          'argocd.argoproj.io/sync-wave': '-10',
-        }) +
         utils.appTemplate.withEnabled(true) +
         application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
         application.spec.source.withTargetRevision('HEAD') +
