@@ -28,3 +28,7 @@ syncer:
   extraArgs:
   - --out-kube-config-server=https://test.localtest.me
   - --tls-san=test.test-vcluster.svc.cluster.local
+
+monitoring:
+  serviceMonitor:
+    enabled: true
