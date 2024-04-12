@@ -1,0 +1,30 @@
+vcluster:
+  image: rancher/k3s:v1.29.1+k3s2
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  host: test.localtest.me
+isolation:
+  enabled: true
+  limitRange:
+    enabled: true
+    default:
+      ephemeral-storage: 8Gi
+      memory: 4Gi
+      cpu: "4"
+    defaultRequest:
+      ephemeral-storage: 3Gi
+      memory: 128Mi
+      cpu: 100m
+sync:
+  nodes:
+    enabled: true
+    syncAllNodes: true
+  persistentvolumes:
+    enabled: true
+  ingresses:
+    enabled: true
+syncer:
+  extraArgs:
+  - --out-kube-config-server=https://test.localtest.me
+  - --tls-san=test.test-vcluster.svc.cluster.local

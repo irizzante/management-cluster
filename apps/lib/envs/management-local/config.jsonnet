@@ -72,6 +72,14 @@ local utils = import 'utils.libsonnet';
         ],
       },
 
+      vcluster:
+        utils.helmTemplate +
+        utils.helmTemplate.withTargetRevision(importstr 'envs/management-local/vcluster/version.txt') +
+        application.spec.destination.withNamespace('test-vcluster') +
+        utils.helmTemplate.withSourcesMixin('https://charts.loft.sh', 'vcluster', self.vcluster.targetRevision, self.vcluster.valueFiles) +
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/vcluster/values.yaml'),
+
+
     },
 
   },
