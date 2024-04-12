@@ -2,3 +2,38 @@ query:
   dnsDiscovery:
     sidecarsService: "prometheus-management-loca-thanos-discovery"
     sidecarsNamespace: "prometheus"
+  replicaCount: 3
+  podAntiAffinityPreset: hard
+  pdb:
+    create: true
+
+queryFrontend:
+  replicaCount: 2
+  podAntiAffinityPreset: hard
+  pdb:
+    create: true
+  ingress:
+    enabled: true
+    hostname: thanos.localtest.me
+    ingressClassName: nginx
+
+storegateway:
+  replicaCount: 2
+  podAntiAffinityPreset: hard
+  pdb:
+    create: true
+  sharded:
+    enabled: true
+    timePartitioning:
+      # One store for data older than 6 weeks
+      - min: ""
+        max: -6w
+
+      # One store for data newer than 6 weeks and older than 2 weeks
+      - min: -6w
+        max: -2w
+
+      # One store for data newer than 2 weeks
+      - min: -2w
+        max: ""
+
