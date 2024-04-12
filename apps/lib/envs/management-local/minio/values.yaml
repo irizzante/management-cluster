@@ -3,3 +3,8 @@ ingress:
 auth:
   existingSecret: minio-secret
   forceNewKeys: true
+
+provisioning:
+  buckets:
+    - name: thanos
+      policy: readwrite
