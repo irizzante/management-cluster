@@ -4,6 +4,8 @@ query:
   replicaLabel: ["replica","prometheus_replica"]
   pdb:
     create: true
+  dnsDiscovery:
+    sidecarsService: "prometheus-operated"
 
 queryFrontend:
   pdb:
