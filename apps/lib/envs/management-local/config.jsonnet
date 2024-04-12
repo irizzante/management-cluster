@@ -44,6 +44,7 @@ local utils = import 'utils.libsonnet';
       argocd+: {
         targetRevision: (importstr 'envs/management-local/argocd/version.txt'),
         valueFiles+: [
+          '$values/apps/lib/envs/management-local/argocd/values.yaml',
           '$values/apps/lib/envs/management-local/argocd/values-replicas.yaml',
         ],
       },
