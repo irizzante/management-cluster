@@ -15,20 +15,20 @@ local utils = import 'utils.libsonnet';
 
     applications+: {
 
-      nginx+: {
-        targetRevision: (importstr 'envs/management-local/nginx/version.txt'),
-        valueFiles+: [
-          '$values/apps/lib/envs/management-local/nginx/values-replicas.yaml',
-        ],
-      },
+      nginx+:
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/nginx/values-replicas.yaml') +
+        {
+          targetRevision: (importstr 'envs/management-local/nginx/version.txt'),
+        },
 
-      prometheus+: {
-        targetRevision: (importstr 'envs/management-local/prometheus/version.txt'),
-        valueFiles+: [
+      prometheus+:
+        utils.helmTemplate.withValueFilesMixin([
           '$values/apps/lib/envs/management-local/prometheus/values-replicas.yaml',
           '$values/apps/lib/envs/management-local/prometheus/values.yaml',
-        ],
-      },
+        ]) +
+        {
+          targetRevision: (importstr 'envs/management-local/prometheus/version.txt'),
+        },
 
       'external-secrets'+: {
         targetRevision: (importstr 'envs/management-local/external-secrets/version.txt'),
@@ -40,36 +40,30 @@ local utils = import 'utils.libsonnet';
         application.spec.source.withTargetRevision('HEAD') +
         application.spec.source.withPath('apps/lib/envs/management-local/external-secrets/manifests'),
 
-      argocd+: {
-        targetRevision: (importstr 'envs/management-local/argocd/version.txt'),
-        valueFiles+: [
+      argocd+:
+        utils.helmTemplate.withValueFilesMixin([
           '$values/apps/lib/envs/management-local/argocd/values.yaml',
           '$values/apps/lib/envs/management-local/argocd/values-replicas.yaml',
-        ],
-      },
+        ]) +
+        {
+          targetRevision: (importstr 'envs/management-local/argocd/version.txt'),
+        },
 
-      'metrics-server'+: {
-        targetRevision: (importstr 'envs/management-local/metrics-server/version.txt'),
-        valueFiles+: [
-          '$values/apps/lib/envs/management-local/metrics-server/values-replicas.yaml',
-        ],
-      },
+      'metrics-server'+:
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/metrics-server/values-replicas.yaml') +
+        {
+          targetRevision: (importstr 'envs/management-local/metrics-server/version.txt'),
+        },
 
       crossplane+: {
         targetRevision: (importstr 'envs/management-local/crossplane/version.txt'),
       },
 
-      minio+: {
-        valueFiles+: [
-          '$values/apps/lib/envs/management-local/minio/values.yaml',
-        ],
-      },
+      minio+:
+        utils.appTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/minio/values.yaml'),
 
-      thanos+: {
-        valueFiles+: [
-          '$values/apps/lib/envs/management-local/thanos/values.yaml',
-        ],
-      },
+      thanos+:
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/thanos/values-replicas.yaml'),
 
       vcluster:
         utils.helmTemplate +
