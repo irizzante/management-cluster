@@ -36,7 +36,6 @@ local utils = import 'utils.libsonnet';
 
       'external-secrets-manifests':
         utils.appTemplate +
-        utils.appTemplate.withEnabled(true) +
         application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
         application.spec.source.withTargetRevision('HEAD') +
         application.spec.source.withPath('apps/lib/envs/management-local/external-secrets/manifests'),
