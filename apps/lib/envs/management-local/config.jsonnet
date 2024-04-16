@@ -5,10 +5,10 @@ local utils = import 'utils.libsonnet';
 (import 'base/config.jsonnet') +
 (import 'variants/prod/config.jsonnet') +
 (import 'variants/local/config.jsonnet') +
-(import 'variants/crossplane/config.jsonnet') +
-(import 'variants/externalsecrets-bitwarden/config.jsonnet') +
-(import 'variants/minio/config.jsonnet') +
-(import 'variants/thanos/config.jsonnet') +
+(import 'base/crossplane/config.jsonnet') +
+(import 'base/externalsecrets-bitwarden/config.jsonnet') +
+(import 'base/minio/config.jsonnet') +
+(import 'base/thanos/config.jsonnet') +
 {
 
   _config+:: {
@@ -60,7 +60,7 @@ local utils = import 'utils.libsonnet';
       },
 
       minio+:
-        utils.appTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/minio/values.yaml'),
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/minio/values.yaml'),
 
       thanos+:
         utils.helmTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/thanos/values-replicas.yaml'),

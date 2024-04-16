@@ -12,11 +12,10 @@ local utils = import 'utils.libsonnet';
         application.metadata.withAnnotationsMixin({
           'argocd.argoproj.io/sync-wave': '-10',
         }) +
-        utils.appTemplate.withEnabled(true) +
         application.spec.destination.withNamespace('external-secrets') +
         application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
         application.spec.source.withTargetRevision(self['cluster-secret-store'].targetRevision) +
-        application.spec.source.withPath('apps/lib/variants/externalsecrets-bitwarden/cluster-secret-store'),
+        application.spec.source.withPath('apps/lib/base/externalsecrets-bitwarden/cluster-secret-store'),
 
     },
 

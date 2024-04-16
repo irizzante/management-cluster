@@ -19,14 +19,13 @@ local utils = import 'utils.libsonnet';
           application.spec.sources.withChart('crossplane') +
           application.spec.sources.helm.withValueFiles(self.crossplane.valueFiles)
         ) +
-        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/variants/crossplane/values.yaml'),
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/crossplane/values.yaml'),
 
       'crossplane-manifests':
         utils.appTemplate +
-        utils.appTemplate.withEnabled(true) +
         application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
         application.spec.source.withTargetRevision('HEAD') +
-        application.spec.source.withPath('apps/lib/variants/crossplane/manifests'),
+        application.spec.source.withPath('apps/lib/base/crossplane/manifests'),
 
     },
 

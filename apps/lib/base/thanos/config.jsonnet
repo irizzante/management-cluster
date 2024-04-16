@@ -12,7 +12,7 @@ local utils = import 'utils.libsonnet';
         application.spec.destination.withNamespace('thanos') +
         utils.helmTemplate.withSourcesMixin('https://charts.bitnami.com/bitnami', 'thanos', self.thanos.targetRevision, self.thanos.valueFiles) +
         utils.helmTemplate.withTargetRevision((importstr 'version.txt')) +
-        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/variants/thanos/values.yaml'),
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/base/thanos/values.yaml'),
 
     },
 
