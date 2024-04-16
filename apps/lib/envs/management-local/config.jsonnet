@@ -3,12 +3,12 @@ local application = argoCd.argoproj.v1alpha1.application;
 local utils = import 'utils.libsonnet';
 
 (import 'base/config.jsonnet') +
-(import 'variants/prod/config.jsonnet') +
-(import 'variants/local/config.jsonnet') +
 (import 'base/crossplane/config.jsonnet') +
 (import 'base/externalsecrets-bitwarden/config.jsonnet') +
 (import 'base/minio/config.jsonnet') +
 (import 'base/thanos/config.jsonnet') +
+(import 'variants/prod/config.jsonnet') +
+(import 'variants/local/config.jsonnet') +
 {
 
   _config+:: {
