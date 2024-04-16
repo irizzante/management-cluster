@@ -45,7 +45,6 @@ local utils = import 'utils.libsonnet';
         },
 
       'metrics-server'+:
-        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/metrics-server/values-replicas.yaml') +
         {
           targetRevision: (importstr 'envs/management-local/metrics-server/version.txt'),
         },
