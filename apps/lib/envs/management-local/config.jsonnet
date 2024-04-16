@@ -7,7 +7,6 @@ local utils = import 'utils.libsonnet';
 (import 'base/externalsecrets-bitwarden/config.jsonnet') +
 (import 'base/minio/config.jsonnet') +
 (import 'base/thanos/config.jsonnet') +
-(import 'variants/prod/config.jsonnet') +
 (import 'variants/local/config.jsonnet') +
 {
 
@@ -41,7 +40,6 @@ local utils = import 'utils.libsonnet';
         application.spec.source.withPath('apps/lib/envs/management-local/external-secrets/manifests'),
 
       argocd+:
-        utils.helmTemplate.withValueFilesMixin(['$values/apps/lib/envs/management-local/argocd/values.yaml']) +
         {
           targetRevision: (importstr 'envs/management-local/argocd/version.txt'),
         },
@@ -52,9 +50,10 @@ local utils = import 'utils.libsonnet';
           targetRevision: (importstr 'envs/management-local/metrics-server/version.txt'),
         },
 
-      crossplane+: {
-        targetRevision: (importstr 'envs/management-local/crossplane/version.txt'),
-      },
+      crossplane+:
+        {
+          targetRevision: (importstr 'envs/management-local/crossplane/version.txt'),
+        },
 
       minio+:
         utils.helmTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/minio/values.yaml'),
