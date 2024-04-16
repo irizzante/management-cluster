@@ -58,7 +58,7 @@ local utils = import 'utils.libsonnet';
         utils.helmTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/minio/values.yaml'),
 
       thanos+:
-        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/thanos/values-replicas.yaml'),
+        utils.helmTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/thanos/values.yaml'),
 
       vcluster:
         utils.helmTemplate +
