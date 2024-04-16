@@ -68,6 +68,12 @@ local utils = import 'utils.libsonnet';
         utils.helmTemplate.withSourcesMixin('https://charts.loft.sh', 'vcluster', self.vcluster.targetRevision, self.vcluster.valueFiles) +
         utils.helmTemplate.withValueFilesMixin('$values/apps/lib/envs/management-local/vcluster/values.yaml'),
 
+      'prometheus-manifests':
+        utils.appTemplate +
+        application.spec.source.withRepoURL('https://github.com/irizzante/management-cluster.git') +
+        application.spec.source.withTargetRevision('HEAD') +
+        application.spec.source.withPath('apps/lib/envs/management-local/prometheus/manifests'),
+
 
     },
 

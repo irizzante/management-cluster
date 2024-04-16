@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: team1
+  namespace: prometheus
+spec:
+  serviceMonitorSelector:
+    matchLabels:
+      prometheus: team1
+  podMonitorSelector:
+    matchLabels:
+      prometheus: team1
+  thanos:
+    blockSize: 2h
+    objectStorageConfig:
+      key: objstore.yml
+      name: thanos-objectstore
+  serviceAccountName: prometheus-management-loca-prometheus
+  externalLabels:
+    team: team1
+    tenant_id: team1
