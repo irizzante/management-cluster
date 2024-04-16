@@ -7,6 +7,7 @@ local utils = import 'utils.libsonnet';
 (import 'base/externalsecrets-bitwarden/config.jsonnet') +
 (import 'base/minio/config.jsonnet') +
 (import 'base/thanos/config.jsonnet') +
+(import 'base/cert-manager/config.jsonnet') +
 (import 'variants/local/config.jsonnet') +
 {
 
