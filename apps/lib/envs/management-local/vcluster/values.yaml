@@ -5,7 +5,7 @@ ingress:
   ingressClassName: nginx
   host: test.localtest.me
 isolation:
-  enabled: true
+  enabled: false
   limitRange:
     enabled: true
     default:
