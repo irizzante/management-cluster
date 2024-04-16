@@ -41,10 +41,7 @@ local utils = import 'utils.libsonnet';
         application.spec.source.withPath('apps/lib/envs/management-local/external-secrets/manifests'),
 
       argocd+:
-        utils.helmTemplate.withValueFilesMixin([
-          '$values/apps/lib/envs/management-local/argocd/values.yaml',
-          '$values/apps/lib/envs/management-local/argocd/values-replicas.yaml',
-        ]) +
+        utils.helmTemplate.withValueFilesMixin(['$values/apps/lib/envs/management-local/argocd/values.yaml']) +
         {
           targetRevision: (importstr 'envs/management-local/argocd/version.txt'),
         },
