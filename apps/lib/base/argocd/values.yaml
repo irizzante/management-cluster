@@ -37,6 +37,8 @@ repoServer:
     emptyDir: {}
 
 configs:
+  secret:
+    argocdServerAdminPassword: $2a$10$0h4jFMDVAAKDRuumxsc1nOJF2vHB2DM/f8ZJPzVQt0iuw3optsiXi
   cmp:
     create: true
     plugins:
