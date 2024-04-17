@@ -39,6 +39,7 @@ repoServer:
 configs:
   secret:
     argocdServerAdminPassword: $2a$10$0h4jFMDVAAKDRuumxsc1nOJF2vHB2DM/f8ZJPzVQt0iuw3optsiXi
+    argocdServerAdminPasswordMtime: "2021-09-29T14:00:00Z"
   cmp:
     create: true
     plugins:
