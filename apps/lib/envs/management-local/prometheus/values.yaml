@@ -36,7 +36,7 @@ prometheusOperator:
 kubelet:
   serviceMonitor:
     metricRelabelings:
-      - sourceLabels: [namespace]
+      - sourceLabels: [__meta_kubernetes_namespace]
         action: drop
         regex: '.*test2.*'
     cAdvisorMetricRelabelings:
@@ -64,14 +64,14 @@ kubelet:
       - sourceLabels: [id, pod]
         action: drop
         regex: '.+;'
-      - sourceLabels: [namespace]
+      - sourceLabels: [__meta_kubernetes_namespace]
         action: drop
         regex: '.*test2.*'
     cAdvisorRelabelings:
       - action: replace
         sourceLabels: [__metrics_path__]
         targetLabel: metrics_path
-      - sourceLabels: [namespace]
+      - sourceLabels: [__meta_kubernetes_namespace]
         action: drop
         regex: '.*test2.*'
 
