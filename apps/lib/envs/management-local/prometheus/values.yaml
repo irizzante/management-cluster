@@ -27,9 +27,9 @@ prometheus:
   thanosServiceMonitor:
     enabled: true
 prometheusOperator:
-  serviceMonitor: 
+  serviceMonitor:
     relabelings:
-      - source_labels: [namespace]
-        target_labels: [namespace]
+      - sourceLabels: [namespace]
+        targetLabel: [namespace]
         action: drop
         regex: ".*vcluster.*"
