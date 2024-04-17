@@ -26,3 +26,10 @@ prometheus:
     enabled: true
   thanosServiceMonitor:
     enabled: true
+prometheusOperator:
+  serviceMonitor: 
+    relabelings:
+      - source_labels: [namespace]
+        target_labels: [namespace]
+        action: drop
+        regex: ".*vcluster.*"
