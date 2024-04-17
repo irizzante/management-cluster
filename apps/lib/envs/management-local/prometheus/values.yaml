@@ -71,7 +71,7 @@ kubelet:
       - action: replace
         sourceLabels: [__metrics_path__]
         targetLabel: metrics_path
-      - sourceLabels: [namespace]
+      - sourceLabels: [__meta_kubernetes_namespace]
         action: drop
         regex: '.*test2.*'
 
