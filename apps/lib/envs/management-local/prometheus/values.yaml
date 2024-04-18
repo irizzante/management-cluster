@@ -26,19 +26,8 @@ prometheus:
     enabled: true
   thanosServiceMonitor:
     enabled: true
-prometheusOperator:
-  serviceMonitor:
-    metricRelabelings:
-      - sourceLabels: [namespace]
-        targetLabel: namespace
-        action: drop
-        regex: '.*test2.*'
 kubelet:
   serviceMonitor:
-    metricRelabelings:
-      - sourceLabels: [__meta_kubernetes_namespace]
-        action: drop
-        regex: '.*test2.*'
     cAdvisorMetricRelabelings:
       # Drop less useful container CPU metrics.
       - sourceLabels: [__name__]
@@ -64,14 +53,7 @@ kubelet:
       - sourceLabels: [id, pod]
         action: drop
         regex: '.+;'
-      - sourceLabels: [__meta_kubernetes_namespace]
+      - sourceLabels: [namespace]
         action: drop
-        regex: '.*test2.*'
-    cAdvisorRelabelings:
-      - action: replace
-        sourceLabels: [__metrics_path__]
-        targetLabel: metrics_path
-      - sourceLabels: [__meta_kubernetes_namespace]
-        action: drop
-        regex: '.*test2.*'
+        regex: '.*vcluster.*'
 
